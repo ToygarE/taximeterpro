@@ -25,3 +25,31 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Artifacts
+
+### Taximeter Pro (`artifacts/taximeter-pro`)
+- **Type**: Expo (React Native / PWA)
+- **Preview path**: `/`
+- **Purpose**: Professional taxi fare calculator app for Dutch taxi drivers
+- **Features**:
+  - Fare calculation based on 2026 Dutch legal maximum rates
+  - Vehicle selection: Personenauto (max 4) / Taxibusje (5-8 persons)
+  - Google Maps Distance Matrix API integration for route data
+  - Offline fallback: manual KM/minutes input
+  - International rides: extra costs for tolls/border surcharges
+  - Settings screen to adjust rates (yearly government indexation)
+  - Ride history with AsyncStorage persistence
+  - PWA installable
+- **Rates (2026 legal maximums)**:
+  - Auto: Start €4.31 | KM €3.17 | Min €0.52
+  - Bus: Start €8.77 | KM €4.00 | Min €0.59
+  - Wait: €59.41/hour
+- **Key files**:
+  - `context/TaximeterContext.tsx` — global state + AsyncStorage persistence
+  - `utils/berekeningen.ts` — fare calculation logic + Google API integration
+  - `app/(tabs)/index.tsx` — main calculator screen
+  - `app/(tabs)/history.tsx` — ride history
+  - `app/(tabs)/settings.tsx` — rate management
+- **Environment variables**:
+  - `EXPO_PUBLIC_GOOGLE_MAPS_KEY` — Google Maps API key (optional, falls back to manual mode)

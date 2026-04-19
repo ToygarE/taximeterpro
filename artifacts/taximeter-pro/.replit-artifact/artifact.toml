@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "Taximeter Pro"
+version = "1.0.0"
+id = "artifacts/taximeter-pro"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 20750
+
+[services.development]
+run = "pnpm --filter @workspace/taximeter-pro run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/taximeter-pro", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/taximeter-pro", "run", "serve" ]
+
+[services.env]
+PORT = "20750"
+BASE_PATH = "/"
