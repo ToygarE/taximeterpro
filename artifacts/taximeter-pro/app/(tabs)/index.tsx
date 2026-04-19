@@ -1,11 +1,13 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
+  Animated,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -21,12 +23,14 @@ import { VoertuigSelector } from "@/components/VoertuigSelector";
 import { useTaximeter } from "@/context/TaximeterContext";
 import type { ExtraKosten, RitResultaat } from "@/context/TaximeterContext";
 import { useColors } from "@/hooks/useColors";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { berekenRit, haalRouteData } from "@/utils/berekeningen";
 
 export default function CalculatorScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { tarieven, addRit } = useTaximeter();
+  const { isOnline } = useNetworkStatus();
 
   const [voertuig, setVoertuig] = useState<"auto" | "bus">("auto");
   const [startLocatie, setStartLocatie] = useState("");
@@ -39,12 +43,40 @@ export default function CalculatorScreen() {
   const [resultaat, setResultaat] = useState<RitResultaat | null>(null);
   const [internationaal, setInternationaal] = useState(false);
 
+  // Auto-switch naar handmatig als offline
+  useEffect(() => {
+    if (!isOnline && modus === "api") {
+      setModus("handmatig");
+    }
+  }, [isOnline]);
+
+  // Animatie voor berekenknop
+  const berekenScale = new Animated.Value(1);
+  const animeerKnop = () => {
+    Animated.sequence([
+      Animated.timing(berekenScale, {
+        toValue: 0.95,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+      Animated.timing(berekenScale, {
+        toValue: 1,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   const berekenPrijs = async () => {
+    animeerKnop();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (modus === "api") {
       if (!startLocatie.trim() || !bestemming.trim()) {
-        Alert.alert("Vereiste velden", "Vul start- en bestemmingslocatie in.");
+        Alert.alert(
+          "Vereiste velden",
+          "Vul een startlocatie en bestemming in, of schakel over naar handmatige invoer."
+        );
         return;
       }
 
@@ -64,11 +96,19 @@ export default function CalculatorScreen() {
         setHandmatigKm(routeData.afstandKm.toFixed(1));
         setHandmatigMin(String(Math.round(routeData.tijdMin)));
         addRit(rit);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } catch (err: any) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert(
-          "API niet beschikbaar",
-          "Stel handmatig de afstand en tijd in om de prijs te berekenen.",
-          [{ text: "Handmatig", onPress: () => setModus("handmatig") }, { text: "OK" }]
+          "Route niet beschikbaar",
+          "Schakel over naar handmatige invoer om de prijs te berekenen.",
+          [
+            {
+              text: "Handmatig invoeren",
+              onPress: () => setModus("handmatig"),
+            },
+            { text: "Annuleren", style: "cancel" },
+          ]
         );
       } finally {
         setLaden(false);
@@ -77,7 +117,10 @@ export default function CalculatorScreen() {
       const km = parseFloat(handmatigKm) || 0;
       const min = parseFloat(handmatigMin) || 0;
       if (km === 0 && min === 0) {
-        Alert.alert("Voer gegevens in", "Vul de afstand en/of reistijd in.");
+        Alert.alert(
+          "Voer gegevens in",
+          "Vul de afstand (km) en/of reistijd (min) in."
+        );
         return;
       }
       const rit = berekenRit({
@@ -91,7 +134,33 @@ export default function CalculatorScreen() {
       });
       setResultaat(rit);
       addRit(rit);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
+  };
+
+  const deelResultaat = async () => {
+    if (!resultaat) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const prijs = `€ ${resultaat.totaalPrijs.toFixed(2).replace(".", ",")}`;
+    const van = resultaat.startLocatie;
+    const naar = resultaat.bestemming;
+    const km = resultaat.afstandKm.toFixed(1);
+    const min = Math.round(resultaat.tijdMin);
+    const voertuigNaam = resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje";
+
+    const tekst =
+      `🚖 Taximeter Pro — Ritprijsberekening\n\n` +
+      `Van: ${van}\n` +
+      `Naar: ${naar}\n\n` +
+      `Afstand: ${km} km | Reistijd: ${min} min\n` +
+      `Voertuig: ${voertuigNaam}\n\n` +
+      `Uw geschatte ritprijs via Taximeter Pro bedraagt: ${prijs}\n\n` +
+      `(Gebaseerd op wettelijke maximumtarieven 2026. Definitieve prijs volgens taxameter.)`;
+
+    try {
+      await Share.share({ message: tekst, title: "Taximeter Pro — Ritprijs" });
+    } catch {}
   };
 
   const reset = () => {
@@ -130,14 +199,29 @@ export default function CalculatorScreen() {
               Tarieven 2026 — wettelijke maxima
             </Text>
           </View>
-          <View
-            style={[styles.tarievenBadge, { backgroundColor: colors.primary }]}
-          >
-            <Text style={[styles.tarievenBadgeTekst, { color: colors.primaryForeground }]}>
-              {voertuig === "auto"
-                ? `€ ${tarieven.autoKm.toFixed(2)}/km`
-                : `€ ${tarieven.busKm.toFixed(2)}/km`}
-            </Text>
+          <View style={styles.headerRechts}>
+            {!isOnline && (
+              <View
+                style={[
+                  styles.offlineBadge,
+                  { backgroundColor: colors.warning + "22", borderColor: colors.warning },
+                ]}
+              >
+                <Feather name="wifi-off" size={12} color={colors.warning} />
+                <Text style={[styles.offlineTekst, { color: colors.warning }]}>
+                  Offline
+                </Text>
+              </View>
+            )}
+            <View
+              style={[styles.tarievenBadge, { backgroundColor: colors.primary }]}
+            >
+              <Text style={[styles.tarievenBadgeTekst, { color: colors.primaryForeground }]}>
+                {voertuig === "auto"
+                  ? `€ ${tarieven.autoKm.toFixed(2)}/km`
+                  : `€ ${tarieven.busKm.toFixed(2)}/km`}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -149,11 +233,22 @@ export default function CalculatorScreen() {
         {/* Invoer modus toggle */}
         <View style={styles.modusRow}>
           <TouchableOpacity
-            onPress={() => setModus("api")}
+            onPress={() => {
+              if (!isOnline) {
+                Alert.alert(
+                  "Offline",
+                  "Geen internetverbinding. Gebruik handmatige invoer."
+                );
+                return;
+              }
+              setModus("api");
+            }}
             style={[
               styles.modusBtn,
               {
-                backgroundColor: modus === "api" ? colors.primary : colors.secondary,
+                backgroundColor:
+                  modus === "api" ? colors.primary : colors.secondary,
+                opacity: !isOnline ? 0.4 : 1,
               },
             ]}
             activeOpacity={0.7}
@@ -178,7 +273,10 @@ export default function CalculatorScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setModus("handmatig")}
+            onPress={() => {
+              Haptics.selectionAsync();
+              setModus("handmatig");
+            }}
             style={[
               styles.modusBtn,
               {
@@ -222,6 +320,7 @@ export default function CalculatorScreen() {
                 waarde={startLocatie}
                 onVerander={setStartLocatie}
                 icoon="map-pin"
+                toonLocatieKnop
               />
             </View>
             <View style={[styles.routePijl, { backgroundColor: colors.border }]}>
@@ -238,6 +337,26 @@ export default function CalculatorScreen() {
           </View>
         ) : (
           <View style={styles.sectie}>
+            {/* Locatie-invoer ook in handmatige modus voor context */}
+            <View style={styles.handmatigLocatieRij}>
+              <View style={{ flex: 1, zIndex: 20 }}>
+                <LocatieInput
+                  label="Van (optioneel)"
+                  waarde={startLocatie}
+                  onVerander={setStartLocatie}
+                  icoon="map-pin"
+                  toonLocatieKnop
+                />
+              </View>
+            </View>
+            <View style={{ flex: 1, zIndex: 10 }}>
+              <LocatieInput
+                label="Naar (optioneel)"
+                waarde={bestemming}
+                onVerander={setBestemming}
+                icoon="flag"
+              />
+            </View>
             <HandmatigInput
               kmWaarde={handmatigKm}
               onKmVerander={setHandmatigKm}
@@ -249,7 +368,10 @@ export default function CalculatorScreen() {
 
         {/* Internationaal toggle */}
         <TouchableOpacity
-          onPress={() => setInternationaal(!internationaal)}
+          onPress={() => {
+            Haptics.selectionAsync();
+            setInternationaal(!internationaal);
+          }}
           activeOpacity={0.7}
           style={[
             styles.internationaalBtn,
@@ -286,28 +408,30 @@ export default function CalculatorScreen() {
         )}
 
         {/* Bereken knop */}
-        <TouchableOpacity
-          onPress={berekenPrijs}
-          activeOpacity={0.85}
-          disabled={laden}
-          style={[
-            styles.berekenKnop,
-            { backgroundColor: laden ? colors.muted : colors.primary },
-          ]}
-        >
-          {laden ? (
-            <Text style={[styles.berekenTekst, { color: colors.mutedForeground }]}>
-              Route ophalen...
-            </Text>
-          ) : (
-            <>
-              <Feather name="arrow-right-circle" size={22} color={colors.primaryForeground} />
-              <Text style={[styles.berekenTekst, { color: colors.primaryForeground }]}>
-                Bereken Ritprijs
+        <Animated.View style={{ transform: [{ scale: berekenScale }] }}>
+          <TouchableOpacity
+            onPress={berekenPrijs}
+            activeOpacity={0.85}
+            disabled={laden}
+            style={[
+              styles.berekenKnop,
+              { backgroundColor: laden ? colors.muted : colors.primary },
+            ]}
+          >
+            {laden ? (
+              <Text style={[styles.berekenTekst, { color: colors.mutedForeground }]}>
+                Route ophalen...
               </Text>
-            </>
-          )}
-        </TouchableOpacity>
+            ) : (
+              <>
+                <Feather name="arrow-right-circle" size={22} color={colors.primaryForeground} />
+                <Text style={[styles.berekenTekst, { color: colors.primaryForeground }]}>
+                  Bereken Ritprijs
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </Animated.View>
 
         {/* Resultaat */}
         {resultaat && (
@@ -316,9 +440,28 @@ export default function CalculatorScreen() {
               <Text style={[styles.resultaatTitel, { color: colors.foreground }]}>
                 Resultaat
               </Text>
-              <TouchableOpacity onPress={reset}>
-                <Feather name="refresh-ccw" size={18} color={colors.mutedForeground} />
-              </TouchableOpacity>
+              <View style={styles.resultaatActies}>
+                <TouchableOpacity
+                  onPress={deelResultaat}
+                  activeOpacity={0.7}
+                  style={[
+                    styles.deelKnop,
+                    { backgroundColor: colors.primary + "22", borderColor: colors.primary },
+                  ]}
+                >
+                  <Feather name="share-2" size={16} color={colors.primary} />
+                  <Text style={[styles.deelTekst, { color: colors.primary }]}>
+                    Deel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={reset}
+                  style={[styles.resetBtn, { backgroundColor: colors.secondary }]}
+                  activeOpacity={0.7}
+                >
+                  <Feather name="refresh-ccw" size={16} color={colors.mutedForeground} />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View
@@ -361,7 +504,7 @@ export default function CalculatorScreen() {
                 </View>
                 <View style={styles.statItem}>
                   <Feather
-                    name={resultaat.voertuig === "auto" ? "arrow-right" : "users"}
+                    name={resultaat.voertuig === "auto" ? "navigation" : "users"}
                     size={14}
                     color={colors.mutedForeground}
                   />
@@ -381,6 +524,19 @@ export default function CalculatorScreen() {
               extraKosten={resultaat.extraKosten}
               totaalPrijs={resultaat.totaalPrijs}
             />
+
+            {/* Disclaimer onder resultaat */}
+            <View
+              style={[
+                styles.disclaimerCard,
+                { backgroundColor: colors.secondary, borderColor: colors.border },
+              ]}
+            >
+              <Feather name="info" size={13} color={colors.mutedForeground} />
+              <Text style={[styles.disclaimerTekst, { color: colors.mutedForeground }]}>
+                Deze prijs is een indicatie op basis van wettelijke maximumtarieven en kan afwijken van de daadwerkelijke taxameter.
+              </Text>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -406,6 +562,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     marginTop: 2,
+  },
+  headerRechts: {
+    alignItems: "flex-end",
+    gap: 6,
+  },
+  offlineBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  offlineTekst: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
   },
   tarievenBadge: {
     borderRadius: 8,
@@ -443,6 +616,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
+  },
+  handmatigLocatieRij: {
+    flexDirection: "row",
+    gap: 10,
   },
   internationaalBtn: {
     flexDirection: "row",
@@ -483,6 +660,31 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "Inter_700Bold",
   },
+  resultaatActies: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  deelKnop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  deelTekst: {
+    fontSize: 13,
+    fontFamily: "Inter_600SemiBold",
+  },
+  resetBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   routeInfo: {
     borderRadius: 14,
     borderWidth: 1,
@@ -516,5 +718,19 @@ const styles = StyleSheet.create({
   statTekst: {
     fontSize: 12,
     fontFamily: "Inter_400Regular",
+  },
+  disclaimerCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 12,
+  },
+  disclaimerTekst: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    flex: 1,
+    lineHeight: 17,
   },
 });

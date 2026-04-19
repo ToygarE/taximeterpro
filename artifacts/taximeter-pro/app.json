@@ -15,21 +15,35 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.taximeter.pro"
+      "bundleIdentifier": "com.taximeter.pro",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#FFD700"
-      }
+      },
+      "package": "com.taximeter.pro",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/images/icon.png",
       "bundler": "metro",
       "name": "Taximeter Pro",
       "shortName": "Taximeter",
+      "description": "Professionele ritprijscalculator voor taxichauffeurs. Bereken direct de wettelijke ritprijs op basis van actuele 2026-tarieven.",
       "backgroundColor": "#0a0a0a",
-      "themeColor": "#FFD700"
+      "themeColor": "#FFD700",
+      "lang": "nl",
+      "startUrl": "/",
+      "display": "standalone",
+      "orientation": "portrait"
     },
     "plugins": [
       [
@@ -39,7 +53,16 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit.",
+          "locationWhenInUsePermission": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

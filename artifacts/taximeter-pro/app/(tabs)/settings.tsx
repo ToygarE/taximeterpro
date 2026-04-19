@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -30,6 +31,7 @@ const DEFAULT_TARIEVEN: TarifSettings = {
 export default function InstellingenScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { tarieven, updateTarieven, resetTarieven } = useTaximeter();
 
   const [lokaal, setLokaal] = useState<Record<string, string>>({});
@@ -58,7 +60,7 @@ export default function InstellingenScreen() {
     };
     updateTarieven(nieuw);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert("Opgeslagen", "Tarieven zijn bijgewerkt.");
+    Alert.alert("Opgeslagen", "Tarieven zijn bijgewerkt en opgeslagen op dit apparaat.");
   };
 
   const reset = () => {
@@ -105,7 +107,7 @@ export default function InstellingenScreen() {
                 {veld.label}
               </Text>
               <Text style={[styles.veldStandaard, { color: colors.mutedForeground }]}>
-                Standaard: € {DEFAULT_TARIEVEN[veld.sleutel].toFixed(2)}
+                Wettelijk max. 2026: € {DEFAULT_TARIEVEN[veld.sleutel].toFixed(2)}
               </Text>
             </View>
             <View style={styles.veldInputRow}>
@@ -116,6 +118,7 @@ export default function InstellingenScreen() {
                   setLokaal((prev) => ({ ...prev, [veld.sleutel]: val }))
                 }
                 keyboardType="decimal-pad"
+                returnKeyType="done"
                 style={[
                   styles.veldInput,
                   {
@@ -124,6 +127,7 @@ export default function InstellingenScreen() {
                     backgroundColor: colors.input,
                   },
                 ]}
+                onFocus={() => Haptics.selectionAsync()}
               />
               <Text style={[styles.eenheid, { color: colors.mutedForeground }]}>
                 {veld.eenheid}
@@ -146,13 +150,14 @@ export default function InstellingenScreen() {
         { paddingTop: pt + 16, paddingBottom: pb + 100 },
       ]}
       showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
       <View style={styles.pageHeader}>
         <Text style={[styles.pageTitel, { color: colors.foreground }]}>
           Tarieven Beheren
         </Text>
         <Text style={[styles.pageSub, { color: colors.mutedForeground }]}>
-          Wettelijke maxima — jaarlijks geïndexeerd
+          Wettelijke maxima — jaarlijks geïndexeerd door de overheid
         </Text>
       </View>
 
@@ -164,7 +169,7 @@ export default function InstellingenScreen() {
       >
         <Feather name="info" size={16} color={colors.primary} />
         <Text style={[styles.infoTekst, { color: colors.primary }]}>
-          De overheid indexeert de maximumtarieven doorgaans per 1 januari. Pas hier de tarieven aan wanneer nieuwe maxima worden gepubliceerd.
+          De overheid indexeert de maximumtarieven doorgaans per 1 januari. Pas hier de tarieven aan zodra nieuwe maxima worden gepubliceerd.
         </Text>
       </View>
 
@@ -209,6 +214,55 @@ export default function InstellingenScreen() {
           Herstellen naar wettelijke standaardtarieven 2026
         </Text>
       </TouchableOpacity>
+
+      {/* Juridisch sectie */}
+      <View
+        style={[
+          styles.juridischSectie,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <Text style={[styles.juridischTitel, { color: colors.foreground }]}>
+          Juridisch & Info
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => router.push("/privacy")}
+          activeOpacity={0.7}
+          style={[styles.juridischRij, { borderBottomColor: colors.border }]}
+        >
+          <Feather name="shield" size={16} color={colors.primary} />
+          <Text style={[styles.juridischTekst, { color: colors.foreground }]}>
+            Privacybeleid
+          </Text>
+          <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+        </TouchableOpacity>
+
+        <View style={styles.juridischRij}>
+          <Feather name="info" size={16} color={colors.mutedForeground} />
+          <View style={styles.versieInfo}>
+            <Text style={[styles.juridischTekst, { color: colors.foreground }]}>
+              Versie
+            </Text>
+            <Text style={[styles.versieNummer, { color: colors.mutedForeground }]}>
+              1.0.0 — Tarieven 2026
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Disclaimer footer */}
+      <View
+        style={[
+          styles.disclaimerCard,
+          { backgroundColor: colors.secondary, borderColor: colors.border },
+        ]}
+      >
+        <Feather name="alert-circle" size={14} color={colors.mutedForeground} />
+        <Text style={[styles.disclaimerTekst, { color: colors.mutedForeground }]}>
+          Deze prijs is een indicatie op basis van wettelijke maximumtarieven en kan afwijken van de daadwerkelijke taxameter.
+        </Text>
+      </View>
     </ScrollView>
   );
 }
@@ -316,11 +370,57 @@ const styles = StyleSheet.create({
   },
   resetKnop: {
     alignItems: "center",
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   resetTekst: {
     fontSize: 13,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
+  },
+  juridischSectie: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+    gap: 0,
+  },
+  juridischTitel: {
+    fontSize: 15,
+    fontFamily: "Inter_700Bold",
+    marginBottom: 12,
+  },
+  juridischRij: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 0,
+  },
+  juridischTekst: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: "Inter_500Medium",
+  },
+  versieInfo: {
+    flex: 1,
+  },
+  versieNummer: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    marginTop: 1,
+  },
+  disclaimerCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 14,
+    marginTop: 4,
+  },
+  disclaimerTekst: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 18,
   },
 });

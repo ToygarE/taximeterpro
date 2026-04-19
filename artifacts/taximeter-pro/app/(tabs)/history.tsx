@@ -1,10 +1,11 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
   Platform,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -20,6 +21,7 @@ export default function GeschiedenisScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { history, clearHistory } = useTaximeter();
+  const [vernieuwen, setVernieuwen] = useState(false);
 
   const formatEuro = (val: number) =>
     `€ ${val.toFixed(2).replace(".", ",")}`;
@@ -34,10 +36,17 @@ export default function GeschiedenisScreen() {
     });
   };
 
+  const onVernieuwen = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setVernieuwen(true);
+    // Simuleer een korte refresh (AsyncStorage is synchroon)
+    setTimeout(() => setVernieuwen(false), 600);
+  }, []);
+
   const verwijderAlles = () => {
     Alert.alert(
       "Geschiedenis wissen",
-      "Wil je alle rithistorie verwijderen?",
+      "Wil je alle rithistorie definitief verwijderen?",
       [
         { text: "Annuleren", style: "cancel" },
         {
@@ -86,7 +95,7 @@ export default function GeschiedenisScreen() {
       <View style={styles.ritMeta}>
         <View style={styles.metaItem}>
           <Feather
-            name={item.voertuig === "auto" ? "arrow-right" : "users"}
+            name={item.voertuig === "auto" ? "navigation" : "users"}
             size={12}
             color={colors.mutedForeground}
           />
@@ -132,26 +141,53 @@ export default function GeschiedenisScreen() {
           styles.listContent,
           { paddingTop: pt + 16, paddingBottom: pb + 100 },
         ]}
+        refreshControl={
+          <RefreshControl
+            refreshing={vernieuwen}
+            onRefresh={onVernieuwen}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+            progressBackgroundColor={colors.card}
+          />
+        }
         ListHeaderComponent={
           <View style={styles.lijstHeader}>
-            <Text style={[styles.pageTitel, { color: colors.foreground }]}>
-              Ritgeschiedenis
-            </Text>
+            <View>
+              <Text style={[styles.pageTitel, { color: colors.foreground }]}>
+                Ritgeschiedenis
+              </Text>
+              {history.length > 0 && (
+                <Text style={[styles.aantalTekst, { color: colors.mutedForeground }]}>
+                  {history.length} {history.length === 1 ? "rit" : "ritten"} opgeslagen
+                </Text>
+              )}
+            </View>
             {history.length > 0 && (
-              <TouchableOpacity onPress={verwijderAlles} activeOpacity={0.7}>
-                <Feather name="trash-2" size={20} color={colors.destructive} />
+              <TouchableOpacity
+                onPress={verwijderAlles}
+                activeOpacity={0.7}
+                style={[styles.wrisBtn, { backgroundColor: colors.destructive + "22" }]}
+              >
+                <Feather name="trash-2" size={16} color={colors.destructive} />
               </TouchableOpacity>
             )}
           </View>
         }
         ListEmptyComponent={
           <View style={styles.leegState}>
-            <Feather name="clock" size={48} color={colors.border} />
+            <View
+              style={[
+                styles.leegIconWrapper,
+                { backgroundColor: colors.card },
+              ]}
+            >
+              <Feather name="clock" size={40} color={colors.border} />
+            </View>
             <Text style={[styles.leegTitel, { color: colors.foreground }]}>
               Nog geen ritten
             </Text>
             <Text style={[styles.leegSub, { color: colors.mutedForeground }]}>
-              Berekende ritten verschijnen hier
+              Berekende ritten verschijnen hier automatisch
             </Text>
           </View>
         }
@@ -173,12 +209,24 @@ const styles = StyleSheet.create({
   lijstHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 12,
   },
   pageTitel: {
     fontSize: 24,
     fontFamily: "Inter_700Bold",
+  },
+  aantalTekst: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    marginTop: 2,
+  },
+  wrisBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
   ritItem: {
     borderRadius: 14,
@@ -248,6 +296,14 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 80,
   },
+  leegIconWrapper: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
   leegTitel: {
     fontSize: 18,
     fontFamily: "Inter_600SemiBold",
@@ -255,5 +311,7 @@ const styles = StyleSheet.create({
   leegSub: {
     fontSize: 14,
     fontFamily: "Inter_400Regular",
+    textAlign: "center",
+    maxWidth: 220,
   },
 });

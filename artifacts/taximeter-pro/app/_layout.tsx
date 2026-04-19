@@ -24,6 +24,7 @@ function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerBackTitle: "Terug" }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="privacy" options={{ headerShown: false }} />
     </Stack>
   );
 }
