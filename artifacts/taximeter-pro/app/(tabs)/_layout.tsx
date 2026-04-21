@@ -13,7 +13,7 @@ function NativeTabLayout() {
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">
-        <Icon sf={{ default: "car", selected: "car.fill" }} />
+        <Icon sf={{ default: "car.fill", selected: "car.fill" }} />
         <Label>Calculator</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="history">
@@ -58,10 +58,7 @@ function ClassicTabLayout() {
             />
           ) : isWeb ? (
             <View
-              style={[
-                StyleSheet.absoluteFill,
-                { backgroundColor: colors.card },
-              ]}
+              style={[StyleSheet.absoluteFill, { backgroundColor: colors.card }]}
             />
           ) : null,
       }}
@@ -72,9 +69,9 @@ function ClassicTabLayout() {
           title: "Calculator",
           tabBarIcon: ({ color }) =>
             isIOS ? (
-              <SymbolView name="car" tintColor={color} size={24} />
+              <SymbolView name="car.fill" tintColor={color} size={24} />
             ) : (
-              <Feather name="dollar-sign" size={22} color={color} />
+              <Feather name="navigation" size={22} color={color} />
             ),
         }}
       />

@@ -1,0 +1,25 @@
+"Voer de volgende uitgebreide update uit voor de 'Taximeter Pro' app. Focus op UI/UX verfijning, bugfixes en het toevoegen van ontbrekende pagina's.
+
+1. Bugfixes & UI Correcties:
+Icoontjes (Android): Fix het probleem waarbij icoontjes als vierkantjes met kruisjes worden getoond op Android. Zorg dat lucide-react correct wordt gebundeld en importeer iconen individueel. Zorg dat de Webview in de app de SVG-iconen ondersteunt.
+
+Valuta: Vervang ALLE Dollar-tekens ($) door het Euro-teken (€) in de gehele applicatie (Calculator, Prijsopgaaf, Geschiedenis).
+
+Z-Index Fix: Zorg dat de Google Maps Autocomplete suggesties (dropdown) ALTIJD op de voorgrond verschijnen. Verhoog de z-index van de .pac-container klasse naar 9999 zodat deze niet achter de 'Internationale rit' sectie valt.
+
+2. Nieuwe Functionaliteit:
+Ritgeschiedenis (Accordion): Maak ritten in de geschiedenis interactief. Bij het klikken op een rit moet deze naar beneden openklappen (accordion style) om extra details te tonen (zoals route, datum, voertuigtype).
+
+Delen & Verwijderen: Voeg per rit in de geschiedenis een 'Deel' knop toe (voor WhatsApp/SMS) en een 'Prullenbak' icoon om individuele ritten te kunnen verwijderen in plaats van alleen de hele lijst.
+
+Tarieven Pagina: Maak deze pagina puur informatief. Verwijder de 'Opslaan' knop en maak de velden 'read-only'. De tarieven moeten echter wel dynamisch uit de centrale config/state worden geladen.
+
+3. Support & Juridisch:
+Support Pagina: Maak een nieuwe route /support aan. Voeg hier een sectie 'Veelgestelde Vragen (FAQ)' toe met de eerder besproken teksten over nauwkeurigheid en tarieven. Toon duidelijk het e-mailadres info@auradigital.nl.
+
+Privacy Policy: Voeg een link in de footer of instellingen toe naar /privacy met de volledige privacytekst voor Toygar Consultancy.
+
+4. Technisch & Verificatie:
+API Key: Verifieer de handmatig toegevoegde Google Maps API Key uit de Secrets. Gebruik deze voor de echte routeberekeningen en kaartweergave.
+
+Firebase Config: Zorg dat de app klaar is voor Firebase Hosting met een correcte firebase.json en manifest.json voor de PWA-status."

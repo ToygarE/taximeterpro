@@ -1,0 +1,41 @@
+{
+  "name": "Taximeter Pro",
+  "short_name": "Taximeter",
+  "description": "Professionele ritprijscalculator voor taxichauffeurs. Bereken direct de wettelijke ritprijs op basis van actuele 2026-tarieven.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#FFD700",
+  "background_color": "#0a0a0a",
+  "lang": "nl",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "/assets/images/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/assets/images/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nieuwe berekening",
+      "short_name": "Berekenen",
+      "description": "Start direct een nieuwe ritprijsberekening",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/assets/images/icon.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

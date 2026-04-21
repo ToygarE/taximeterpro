@@ -34,6 +34,7 @@ export interface RitResultaat {
   startLocatie: string;
   bestemming: string;
   timestamp: number;
+  id: string;
 }
 
 const DEFAULT_TARIEVEN: TarifSettings = {
@@ -55,6 +56,7 @@ interface TaximeterContextType {
   resetTarieven: () => void;
   history: RitResultaat[];
   addRit: (rit: RitResultaat) => void;
+  deleteRit: (id: string) => void;
   clearHistory: () => void;
 }
 
@@ -67,16 +69,12 @@ export function TaximeterProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY_TARIEVEN).then((val) => {
       if (val) {
-        try {
-          setTarieven(JSON.parse(val));
-        } catch {}
+        try { setTarieven(JSON.parse(val)); } catch {}
       }
     });
     AsyncStorage.getItem(STORAGE_KEY_HISTORY).then((val) => {
       if (val) {
-        try {
-          setHistory(JSON.parse(val));
-        } catch {}
+        try { setHistory(JSON.parse(val)); } catch {}
       }
     });
   }, []);
@@ -99,6 +97,14 @@ export function TaximeterProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const deleteRit = useCallback((id: string) => {
+    setHistory((prev) => {
+      const next = prev.filter((r) => r.id !== id);
+      AsyncStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const clearHistory = useCallback(() => {
     setHistory([]);
     AsyncStorage.removeItem(STORAGE_KEY_HISTORY);
@@ -112,6 +118,7 @@ export function TaximeterProvider({ children }: { children: React.ReactNode }) {
         resetTarieven,
         history,
         addRit,
+        deleteRit,
         clearHistory,
       }}
     >

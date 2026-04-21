@@ -42,6 +42,10 @@ export async function haalRouteData(
   };
 }
 
+function genId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+}
+
 interface BerekenParams {
   voertuig: "auto" | "bus";
   afstandKm: number;
@@ -66,6 +70,7 @@ export function berekenRit(params: BerekenParams): RitResultaat {
   const totaalPrijs = startTarief + kmKosten + minKosten + extraTotaal;
 
   return {
+    id: genId(),
     voertuig,
     afstandKm,
     tijdMin,
