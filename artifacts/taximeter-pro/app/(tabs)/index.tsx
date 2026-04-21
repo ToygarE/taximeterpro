@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import {
@@ -19,6 +19,7 @@ import { ExtraKostenInput } from "@/components/ExtraKostenInput";
 import { HandmatigInput } from "@/components/HandmatigInput";
 import { LocatieInput } from "@/components/LocatieInput";
 import { PrijsDisplay } from "@/components/PrijsDisplay";
+import { RouteKaart } from "@/components/RouteKaart";
 import { VoertuigSelector } from "@/components/VoertuigSelector";
 import { useTaximeter } from "@/context/TaximeterContext";
 import type { ExtraKosten, RitResultaat } from "@/context/TaximeterContext";
@@ -43,73 +44,42 @@ export default function CalculatorScreen() {
   const [resultaat, setResultaat] = useState<RitResultaat | null>(null);
   const [internationaal, setInternationaal] = useState(false);
 
-  // Auto-switch naar handmatig als offline
   useEffect(() => {
-    if (!isOnline && modus === "api") {
-      setModus("handmatig");
-    }
+    if (!isOnline && modus === "api") setModus("handmatig");
   }, [isOnline]);
 
-  // Animatie voor berekenknop
   const berekenScale = new Animated.Value(1);
   const animeerKnop = () => {
     Animated.sequence([
-      Animated.timing(berekenScale, {
-        toValue: 0.95,
-        duration: 80,
-        useNativeDriver: true,
-      }),
-      Animated.timing(berekenScale, {
-        toValue: 1,
-        duration: 80,
-        useNativeDriver: true,
-      }),
+      Animated.timing(berekenScale, { toValue: 0.95, duration: 80, useNativeDriver: true }),
+      Animated.timing(berekenScale, { toValue: 1, duration: 80, useNativeDriver: true }),
     ]).start();
   };
 
   const berekenPrijs = async () => {
     animeerKnop();
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (modus === "api") {
       if (!startLocatie.trim() || !bestemming.trim()) {
-        Alert.alert(
-          "Vereiste velden",
-          "Vul een startlocatie en bestemming in, of schakel over naar handmatige invoer."
-        );
+        Alert.alert("Vereiste velden", "Vul een startlocatie en bestemming in, of schakel over naar handmatige invoer.");
         return;
       }
-
       setLaden(true);
       try {
         const routeData = await haalRouteData(startLocatie, bestemming);
-        const rit = berekenRit({
-          voertuig,
-          afstandKm: routeData.afstandKm,
-          tijdMin: routeData.tijdMin,
-          tarieven,
-          extraKosten,
-          startLocatie,
-          bestemming,
-        });
+        const rit = berekenRit({ voertuig, afstandKm: routeData.afstandKm, tijdMin: routeData.tijdMin, tarieven, extraKosten, startLocatie, bestemming });
         setResultaat(rit);
         setHandmatigKm(routeData.afstandKm.toFixed(1));
         setHandmatigMin(String(Math.round(routeData.tijdMin)));
         addRit(rit);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      } catch (err: any) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        Alert.alert(
-          "Route niet beschikbaar",
-          "Schakel over naar handmatige invoer om de prijs te berekenen.",
-          [
-            {
-              text: "Handmatig invoeren",
-              onPress: () => setModus("handmatig"),
-            },
-            { text: "Annuleren", style: "cancel" },
-          ]
-        );
+        if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch {
+        if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        Alert.alert("Route niet beschikbaar", "Schakel over naar handmatige invoer om de prijs te berekenen.", [
+          { text: "Handmatig invoeren", onPress: () => setModus("handmatig") },
+          { text: "Annuleren", style: "cancel" },
+        ]);
       } finally {
         setLaden(false);
       }
@@ -117,54 +87,33 @@ export default function CalculatorScreen() {
       const km = parseFloat(handmatigKm) || 0;
       const min = parseFloat(handmatigMin) || 0;
       if (km === 0 && min === 0) {
-        Alert.alert(
-          "Voer gegevens in",
-          "Vul de afstand (km) en/of reistijd (min) in."
-        );
+        Alert.alert("Voer gegevens in", "Vul de afstand (km) en/of reistijd (min) in.");
         return;
       }
-      const rit = berekenRit({
-        voertuig,
-        afstandKm: km,
-        tijdMin: min,
-        tarieven,
-        extraKosten,
-        startLocatie: startLocatie || "Onbekend",
-        bestemming: bestemming || "Onbekend",
-      });
+      const rit = berekenRit({ voertuig, afstandKm: km, tijdMin: min, tarieven, extraKosten, startLocatie: startLocatie || "Onbekend", bestemming: bestemming || "Onbekend" });
       setResultaat(rit);
       addRit(rit);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
   };
 
   const deelResultaat = async () => {
     if (!resultaat) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-    const prijs = `€ ${resultaat.totaalPrijs.toFixed(2).replace(".", ",")}`;
-    const van = resultaat.startLocatie;
-    const naar = resultaat.bestemming;
-    const km = resultaat.afstandKm.toFixed(1);
-    const min = Math.round(resultaat.tijdMin);
-    const voertuigNaam = resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje";
-
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const prijs = "€ " + resultaat.totaalPrijs.toFixed(2).replace(".", ",");
     const tekst =
-      `🚖 Taximeter Pro — Ritprijsberekening\n\n` +
-      `Van: ${van}\n` +
-      `Naar: ${naar}\n\n` +
-      `Afstand: ${km} km | Reistijd: ${min} min\n` +
-      `Voertuig: ${voertuigNaam}\n\n` +
-      `Uw geschatte ritprijs via Taximeter Pro bedraagt: ${prijs}\n\n` +
-      `(Gebaseerd op wettelijke maximumtarieven 2026. Definitieve prijs volgens taxameter.)`;
-
-    try {
-      await Share.share({ message: tekst, title: "Taximeter Pro — Ritprijs" });
-    } catch {}
+      "Taximeter Pro - Ritprijsberekening\n\n" +
+      "Van: " + resultaat.startLocatie + "\n" +
+      "Naar: " + resultaat.bestemming + "\n\n" +
+      "Afstand: " + resultaat.afstandKm.toFixed(1) + " km | Reistijd: " + Math.round(resultaat.tijdMin) + " min\n" +
+      "Voertuig: " + (resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
+      "Uw geschatte ritprijs via Taximeter Pro bedraagt: " + prijs + "\n\n" +
+      "(Gebaseerd op wettelijke maximumtarieven 2026. Definitieve prijs volgens taxameter.)";
+    try { await Share.share({ message: tekst, title: "Taximeter Pro - Ritprijs" }); } catch {}
   };
 
   const reset = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setResultaat(null);
     setStartLocatie("");
     setBestemming("");
@@ -182,132 +131,56 @@ export default function CalculatorScreen() {
       style={{ flex: 1, backgroundColor: colors.background }}
     >
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: pt + 16, paddingBottom: pb + 100 },
-        ]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: pt + 16, paddingBottom: pb + 100 }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
         <View style={styles.headerRow}>
           <View>
-            <Text style={[styles.appTitel, { color: colors.primary }]}>
-              Taximeter Pro
-            </Text>
+            <Text style={[styles.appTitel, { color: colors.primary }]}>Taximeter Pro</Text>
             <Text style={[styles.subTitel, { color: colors.mutedForeground }]}>
-              Tarieven 2026 — wettelijke maxima
+              Tarieven 2026 - wettelijke maxima
             </Text>
           </View>
           <View style={styles.headerRechts}>
             {!isOnline && (
-              <View
-                style={[
-                  styles.offlineBadge,
-                  { backgroundColor: colors.warning + "22", borderColor: colors.warning },
-                ]}
-              >
-                <Feather name="wifi-off" size={12} color={colors.warning} />
-                <Text style={[styles.offlineTekst, { color: colors.warning }]}>
-                  Offline
-                </Text>
+              <View style={[styles.offlineBadge, { backgroundColor: colors.warning + "22", borderColor: colors.warning }]}>
+                <MaterialCommunityIcons name="wifi-off" size={12} color={colors.warning} />
+                <Text style={[styles.offlineTekst, { color: colors.warning }]}>Offline</Text>
               </View>
             )}
-            <View
-              style={[styles.tarievenBadge, { backgroundColor: colors.primary }]}
-            >
+            <View style={[styles.tarievenBadge, { backgroundColor: colors.primary }]}>
               <Text style={[styles.tarievenBadgeTekst, { color: colors.primaryForeground }]}>
-                {voertuig === "auto"
-                  ? `€ ${tarieven.autoKm.toFixed(2)}/km`
-                  : `€ ${tarieven.busKm.toFixed(2)}/km`}
+                {voertuig === "auto" ? `€ ${tarieven.autoKm.toFixed(2)}/km` : `€ ${tarieven.busKm.toFixed(2)}/km`}
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Voertuig selectie */}
-        <View style={styles.sectie}>
-          <VoertuigSelector value={voertuig} onChange={setVoertuig} />
-        </View>
+        {/* Voertuig */}
+        <VoertuigSelector value={voertuig} onChange={setVoertuig} />
 
-        {/* Invoer modus toggle */}
+        {/* Modus toggle */}
         <View style={styles.modusRow}>
           <TouchableOpacity
             onPress={() => {
-              if (!isOnline) {
-                Alert.alert(
-                  "Offline",
-                  "Geen internetverbinding. Gebruik handmatige invoer."
-                );
-                return;
-              }
+              if (!isOnline) { Alert.alert("Offline", "Geen internetverbinding. Gebruik handmatige invoer."); return; }
               setModus("api");
             }}
-            style={[
-              styles.modusBtn,
-              {
-                backgroundColor:
-                  modus === "api" ? colors.primary : colors.secondary,
-                opacity: !isOnline ? 0.4 : 1,
-              },
-            ]}
+            style={[styles.modusBtn, { backgroundColor: modus === "api" ? colors.primary : colors.secondary, opacity: !isOnline ? 0.4 : 1 }]}
             activeOpacity={0.7}
           >
-            <Feather
-              name="navigation"
-              size={14}
-              color={modus === "api" ? colors.primaryForeground : colors.mutedForeground}
-            />
-            <Text
-              style={[
-                styles.modus,
-                {
-                  color:
-                    modus === "api"
-                      ? colors.primaryForeground
-                      : colors.mutedForeground,
-                },
-              ]}
-            >
-              Route opzoeken
-            </Text>
+            <MaterialCommunityIcons name="navigation" size={16} color={modus === "api" ? colors.primaryForeground : colors.mutedForeground} />
+            <Text style={[styles.modus, { color: modus === "api" ? colors.primaryForeground : colors.mutedForeground }]}>Route opzoeken</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => {
-              Haptics.selectionAsync();
-              setModus("handmatig");
-            }}
-            style={[
-              styles.modusBtn,
-              {
-                backgroundColor:
-                  modus === "handmatig" ? colors.primary : colors.secondary,
-              },
-            ]}
+            onPress={() => { if (Platform.OS !== "web") Haptics.selectionAsync(); setModus("handmatig"); }}
+            style={[styles.modusBtn, { backgroundColor: modus === "handmatig" ? colors.primary : colors.secondary }]}
             activeOpacity={0.7}
           >
-            <Feather
-              name="edit-3"
-              size={14}
-              color={
-                modus === "handmatig"
-                  ? colors.primaryForeground
-                  : colors.mutedForeground
-              }
-            />
-            <Text
-              style={[
-                styles.modus,
-                {
-                  color:
-                    modus === "handmatig"
-                      ? colors.primaryForeground
-                      : colors.mutedForeground,
-                },
-              ]}
-            >
-              Handmatig
-            </Text>
+            <MaterialCommunityIcons name="pencil" size={16} color={modus === "handmatig" ? colors.primaryForeground : colors.mutedForeground} />
+            <Text style={[styles.modus, { color: modus === "handmatig" ? colors.primaryForeground : colors.mutedForeground }]}>Handmatig</Text>
           </TouchableOpacity>
         </View>
 
@@ -315,97 +188,41 @@ export default function CalculatorScreen() {
         {modus === "api" ? (
           <View style={styles.sectie}>
             <View style={{ zIndex: 20 }}>
-              <LocatieInput
-                label="Startlocatie"
-                waarde={startLocatie}
-                onVerander={setStartLocatie}
-                icoon="map-pin"
-                toonLocatieKnop
-              />
+              <LocatieInput label="Startlocatie" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-marker" toonLocatieKnop />
             </View>
             <View style={[styles.routePijl, { backgroundColor: colors.border }]}>
-              <Feather name="arrow-down" size={16} color={colors.mutedForeground} />
+              <MaterialCommunityIcons name="arrow-down" size={16} color={colors.mutedForeground} />
             </View>
             <View style={{ zIndex: 10 }}>
-              <LocatieInput
-                label="Bestemming"
-                waarde={bestemming}
-                onVerander={setBestemming}
-                icoon="flag"
-              />
+              <LocatieInput label="Bestemming" waarde={bestemming} onVerander={setBestemming} icoon="flag" />
             </View>
           </View>
         ) : (
           <View style={styles.sectie}>
-            {/* Locatie-invoer ook in handmatige modus voor context */}
-            <View style={styles.handmatigLocatieRij}>
-              <View style={{ flex: 1, zIndex: 20 }}>
-                <LocatieInput
-                  label="Van (optioneel)"
-                  waarde={startLocatie}
-                  onVerander={setStartLocatie}
-                  icoon="map-pin"
-                  toonLocatieKnop
-                />
-              </View>
+            <View style={{ flex: 1, zIndex: 20 }}>
+              <LocatieInput label="Van (optioneel)" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-marker" toonLocatieKnop />
             </View>
-            <View style={{ flex: 1, zIndex: 10 }}>
-              <LocatieInput
-                label="Naar (optioneel)"
-                waarde={bestemming}
-                onVerander={setBestemming}
-                icoon="flag"
-              />
+            <View style={{ zIndex: 10 }}>
+              <LocatieInput label="Naar (optioneel)" waarde={bestemming} onVerander={setBestemming} icoon="flag" />
             </View>
-            <HandmatigInput
-              kmWaarde={handmatigKm}
-              onKmVerander={setHandmatigKm}
-              minWaarde={handmatigMin}
-              onMinVerander={setHandmatigMin}
-            />
+            <HandmatigInput kmWaarde={handmatigKm} onKmVerander={setHandmatigKm} minWaarde={handmatigMin} onMinVerander={setHandmatigMin} />
           </View>
         )}
 
-        {/* Internationaal toggle */}
+        {/* Internationaal */}
         <TouchableOpacity
-          onPress={() => {
-            Haptics.selectionAsync();
-            setInternationaal(!internationaal);
-          }}
+          onPress={() => { if (Platform.OS !== "web") Haptics.selectionAsync(); setInternationaal(!internationaal); }}
           activeOpacity={0.7}
-          style={[
-            styles.internationaalBtn,
-            {
-              backgroundColor: internationaal ? "#f97316" + "22" : colors.secondary,
-              borderColor: internationaal ? colors.warning : colors.border,
-            },
-          ]}
+          style={[styles.internationaalBtn, { backgroundColor: internationaal ? "#f97316" + "22" : colors.secondary, borderColor: internationaal ? colors.warning : colors.border }]}
         >
-          <Feather
-            name="globe"
-            size={16}
-            color={internationaal ? colors.warning : colors.mutedForeground}
-          />
-          <Text
-            style={[
-              styles.internationaalTekst,
-              { color: internationaal ? colors.warning : colors.mutedForeground },
-            ]}
-          >
+          <MaterialCommunityIcons name="earth" size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
+          <Text style={[styles.internationaalTekst, { color: internationaal ? colors.warning : colors.mutedForeground }]}>
             Internationale rit / extra kosten
           </Text>
-          <Feather
-            name={internationaal ? "chevron-up" : "chevron-down"}
-            size={16}
-            color={internationaal ? colors.warning : colors.mutedForeground}
-          />
+          <MaterialCommunityIcons name={internationaal ? "chevron-up" : "chevron-down"} size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
         </TouchableOpacity>
 
-        {internationaal && (
-          <View style={styles.sectie}>
-            <ExtraKostenInput kosten={extraKosten} onChange={setExtraKosten} />
-          </View>
-        )}
+        {internationaal && <ExtraKostenInput kosten={extraKosten} onChange={setExtraKosten} />}
 
         {/* Bereken knop */}
         <Animated.View style={{ transform: [{ scale: berekenScale }] }}>
@@ -413,21 +230,14 @@ export default function CalculatorScreen() {
             onPress={berekenPrijs}
             activeOpacity={0.85}
             disabled={laden}
-            style={[
-              styles.berekenKnop,
-              { backgroundColor: laden ? colors.muted : colors.primary },
-            ]}
+            style={[styles.berekenKnop, { backgroundColor: laden ? colors.muted : colors.primary }]}
           >
             {laden ? (
-              <Text style={[styles.berekenTekst, { color: colors.mutedForeground }]}>
-                Route ophalen...
-              </Text>
+              <Text style={[styles.berekenTekst, { color: colors.mutedForeground }]}>Route ophalen...</Text>
             ) : (
               <>
-                <Feather name="arrow-right-circle" size={22} color={colors.primaryForeground} />
-                <Text style={[styles.berekenTekst, { color: colors.primaryForeground }]}>
-                  Bereken Ritprijs
-                </Text>
+                <MaterialCommunityIcons name="arrow-right-circle" size={24} color={colors.primaryForeground} />
+                <Text style={[styles.berekenTekst, { color: colors.primaryForeground }]}>Bereken Ritprijs</Text>
               </>
             )}
           </TouchableOpacity>
@@ -437,77 +247,43 @@ export default function CalculatorScreen() {
         {resultaat && (
           <View style={styles.resultaatWrapper}>
             <View style={styles.resultaatHeader}>
-              <Text style={[styles.resultaatTitel, { color: colors.foreground }]}>
-                Resultaat
-              </Text>
+              <Text style={[styles.resultaatTitel, { color: colors.foreground }]}>Resultaat</Text>
               <View style={styles.resultaatActies}>
-                <TouchableOpacity
-                  onPress={deelResultaat}
-                  activeOpacity={0.7}
-                  style={[
-                    styles.deelKnop,
-                    { backgroundColor: colors.primary + "22", borderColor: colors.primary },
-                  ]}
-                >
-                  <Feather name="share-2" size={16} color={colors.primary} />
-                  <Text style={[styles.deelTekst, { color: colors.primary }]}>
-                    Deel
-                  </Text>
+                <TouchableOpacity onPress={deelResultaat} activeOpacity={0.7}
+                  style={[styles.deelKnop, { backgroundColor: colors.primary + "22", borderColor: colors.primary }]}>
+                  <MaterialCommunityIcons name="share-variant" size={16} color={colors.primary} />
+                  <Text style={[styles.deelTekst, { color: colors.primary }]}>Deel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={reset}
-                  style={[styles.resetBtn, { backgroundColor: colors.secondary }]}
-                  activeOpacity={0.7}
-                >
-                  <Feather name="refresh-ccw" size={16} color={colors.mutedForeground} />
+                <TouchableOpacity onPress={reset} style={[styles.resetBtn, { backgroundColor: colors.secondary }]} activeOpacity={0.7}>
+                  <MaterialCommunityIcons name="refresh" size={16} color={colors.mutedForeground} />
                 </TouchableOpacity>
               </View>
             </View>
 
-            <View
-              style={[
-                styles.routeInfo,
-                { backgroundColor: colors.card, borderColor: colors.border },
-              ]}
-            >
+            {/* Routekaart */}
+            <RouteKaart startLocatie={resultaat.startLocatie} bestemming={resultaat.bestemming} hoogte={250} />
+
+            <View style={[styles.routeInfo, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <View style={styles.routeRegel}>
-                <Feather name="map-pin" size={14} color={colors.primary} />
-                <Text
-                  style={[styles.routeTekst, { color: colors.foreground }]}
-                  numberOfLines={1}
-                >
-                  {resultaat.startLocatie}
-                </Text>
+                <MaterialCommunityIcons name="map-marker" size={14} color={colors.primary} />
+                <Text style={[styles.routeTekst, { color: colors.foreground }]} numberOfLines={1}>{resultaat.startLocatie}</Text>
               </View>
               <View style={[styles.routeDivider, { backgroundColor: colors.border }]} />
               <View style={styles.routeRegel}>
-                <Feather name="flag" size={14} color={colors.primary} />
-                <Text
-                  style={[styles.routeTekst, { color: colors.foreground }]}
-                  numberOfLines={1}
-                >
-                  {resultaat.bestemming}
-                </Text>
+                <MaterialCommunityIcons name="flag" size={14} color={colors.primary} />
+                <Text style={[styles.routeTekst, { color: colors.foreground }]} numberOfLines={1}>{resultaat.bestemming}</Text>
               </View>
               <View style={styles.statsRij}>
                 <View style={styles.statItem}>
-                  <Feather name="activity" size={14} color={colors.mutedForeground} />
-                  <Text style={[styles.statTekst, { color: colors.mutedForeground }]}>
-                    {resultaat.afstandKm.toFixed(1)} km
-                  </Text>
+                  <MaterialCommunityIcons name="chart-line-variant" size={13} color={colors.mutedForeground} />
+                  <Text style={[styles.statTekst, { color: colors.mutedForeground }]}>{resultaat.afstandKm.toFixed(1)} km</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Feather name="clock" size={14} color={colors.mutedForeground} />
-                  <Text style={[styles.statTekst, { color: colors.mutedForeground }]}>
-                    {Math.round(resultaat.tijdMin)} min
-                  </Text>
+                  <MaterialCommunityIcons name="clock-outline" size={13} color={colors.mutedForeground} />
+                  <Text style={[styles.statTekst, { color: colors.mutedForeground }]}>{Math.round(resultaat.tijdMin)} min</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Feather
-                    name={resultaat.voertuig === "auto" ? "navigation" : "users"}
-                    size={14}
-                    color={colors.mutedForeground}
-                  />
+                  <MaterialCommunityIcons name={resultaat.voertuig === "auto" ? "car" : "bus"} size={13} color={colors.mutedForeground} />
                   <Text style={[styles.statTekst, { color: colors.mutedForeground }]}>
                     {resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje"}
                   </Text>
@@ -525,14 +301,8 @@ export default function CalculatorScreen() {
               totaalPrijs={resultaat.totaalPrijs}
             />
 
-            {/* Disclaimer onder resultaat */}
-            <View
-              style={[
-                styles.disclaimerCard,
-                { backgroundColor: colors.secondary, borderColor: colors.border },
-              ]}
-            >
-              <Feather name="info" size={13} color={colors.mutedForeground} />
+            <View style={[styles.disclaimerCard, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
+              <MaterialCommunityIcons name="information" size={13} color={colors.mutedForeground} />
               <Text style={[styles.disclaimerTekst, { color: colors.mutedForeground }]}>
                 Deze prijs is een indicatie op basis van wettelijke maximumtarieven en kan afwijken van de daadwerkelijke taxameter.
               </Text>
@@ -545,192 +315,38 @@ export default function CalculatorScreen() {
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: 20,
-    gap: 16,
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  appTitel: {
-    fontSize: 28,
-    fontFamily: "Inter_700Bold",
-  },
-  subTitel: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    marginTop: 2,
-  },
-  headerRechts: {
-    alignItems: "flex-end",
-    gap: 6,
-  },
-  offlineBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    borderRadius: 6,
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  offlineTekst: {
-    fontSize: 11,
-    fontFamily: "Inter_600SemiBold",
-  },
-  tarievenBadge: {
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  tarievenBadgeTekst: {
-    fontSize: 13,
-    fontFamily: "Inter_700Bold",
-  },
-  sectie: {
-    gap: 10,
-  },
-  modusRow: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  modusBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    borderRadius: 10,
-    paddingVertical: 10,
-  },
-  modus: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-  },
-  routePijl: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-  },
-  handmatigLocatieRij: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  internationaalBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  internationaalTekst: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: "Inter_500Medium",
-  },
-  berekenKnop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    borderRadius: 16,
-    paddingVertical: 18,
-    marginTop: 4,
-  },
-  berekenTekst: {
-    fontSize: 18,
-    fontFamily: "Inter_700Bold",
-  },
-  resultaatWrapper: {
-    gap: 12,
-  },
-  resultaatHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  resultaatTitel: {
-    fontSize: 18,
-    fontFamily: "Inter_700Bold",
-  },
-  resultaatActies: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  deelKnop: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    borderRadius: 10,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-  },
-  deelTekst: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-  },
-  resetBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  routeInfo: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 14,
-    gap: 8,
-  },
-  routeRegel: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  routeTekst: {
-    fontSize: 14,
-    fontFamily: "Inter_500Medium",
-    flex: 1,
-  },
-  routeDivider: {
-    height: 1,
-    marginLeft: 22,
-  },
-  statsRij: {
-    flexDirection: "row",
-    gap: 16,
-    marginTop: 4,
-  },
-  statItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  statTekst: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-  },
-  disclaimerCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    padding: 12,
-  },
-  disclaimerTekst: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    flex: 1,
-    lineHeight: 17,
-  },
+  scrollContent: { paddingHorizontal: 20, gap: 16 },
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
+  appTitel: { fontSize: 28, fontFamily: "Inter_700Bold" },
+  subTitel: { fontSize: 12, fontFamily: "Inter_400Regular", marginTop: 2 },
+  headerRechts: { alignItems: "flex-end", gap: 6 },
+  offlineBadge: { flexDirection: "row", alignItems: "center", gap: 4, borderRadius: 6, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4 },
+  offlineTekst: { fontSize: 11, fontFamily: "Inter_600SemiBold" },
+  tarievenBadge: { borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+  tarievenBadgeTekst: { fontSize: 13, fontFamily: "Inter_700Bold" },
+  sectie: { gap: 10 },
+  modusRow: { flexDirection: "row", gap: 8 },
+  modusBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, paddingVertical: 10 },
+  modus: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
+  routePijl: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", alignSelf: "center" },
+  internationaalBtn: { flexDirection: "row", alignItems: "center", gap: 10, borderRadius: 12, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 12 },
+  internationaalTekst: { flex: 1, fontSize: 14, fontFamily: "Inter_500Medium" },
+  berekenKnop: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, borderRadius: 16, paddingVertical: 18, marginTop: 4 },
+  berekenTekst: { fontSize: 18, fontFamily: "Inter_700Bold" },
+  resultaatWrapper: { gap: 12 },
+  resultaatHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  resultaatTitel: { fontSize: 18, fontFamily: "Inter_700Bold" },
+  resultaatActies: { flexDirection: "row", alignItems: "center", gap: 8 },
+  deelKnop: { flexDirection: "row", alignItems: "center", gap: 6, borderRadius: 10, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 7 },
+  deelTekst: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
+  resetBtn: { width: 36, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  routeInfo: { borderRadius: 14, borderWidth: 1, padding: 14, gap: 8 },
+  routeRegel: { flexDirection: "row", alignItems: "center", gap: 8 },
+  routeTekst: { fontSize: 14, fontFamily: "Inter_500Medium", flex: 1 },
+  routeDivider: { height: 1, marginLeft: 22 },
+  statsRij: { flexDirection: "row", gap: 16, marginTop: 4 },
+  statItem: { flexDirection: "row", alignItems: "center", gap: 4 },
+  statTekst: { fontSize: 12, fontFamily: "Inter_400Regular" },
+  disclaimerCard: { flexDirection: "row", alignItems: "flex-start", gap: 8, borderRadius: 10, borderWidth: 1, padding: 12 },
+  disclaimerTekst: { flex: 1, fontSize: 12, fontFamily: "Inter_400Regular", lineHeight: 18 },
 });

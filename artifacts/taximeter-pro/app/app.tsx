@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import {
@@ -38,7 +38,7 @@ function DesktopOverlay({ colors }: { colors: any }) {
       <View style={overlayStyles.achtergrond}>
         <View style={[overlayStyles.kaart, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={[overlayStyles.icon, { backgroundColor: colors.primary }]}>
-            <Feather name="smartphone" size={32} color="#000" />
+            <MaterialCommunityIcons name="cellphone" size={32} color="#000" />
           </View>
           <Text style={[overlayStyles.titel, { color: colors.foreground }]}>
             Taximeter Pro werkt het best op mobiel
@@ -52,7 +52,7 @@ function DesktopOverlay({ colors }: { colors: any }) {
               style={[overlayStyles.knop, { backgroundColor: colors.primary }]}
               activeOpacity={0.8}
             >
-              <Feather name="smartphone" size={16} color="#000" />
+              <MaterialCommunityIcons name="cellphone" size={16} color="#000" />
               <Text style={overlayStyles.knopTekst}>Google Play</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -60,7 +60,7 @@ function DesktopOverlay({ colors }: { colors: any }) {
               style={[overlayStyles.knop, { backgroundColor: colors.primary }]}
               activeOpacity={0.8}
             >
-              <Feather name="tablet" size={16} color="#000" />
+              <MaterialCommunityIcons name="tablet" size={16} color="#000" />
               <Text style={overlayStyles.knopTekst}>App Store</Text>
             </TouchableOpacity>
           </View>
@@ -144,14 +144,14 @@ export default function AppScreen() {
 
   const deelResultaat = async () => {
     if (!resultaat) return;
-    const prijs = `€ ${resultaat.totaalPrijs.toFixed(2).replace(".", ",")}`;
+    const prijs = "€ " + resultaat.totaalPrijs.toFixed(2).replace(".", ",");
     const tekst =
-      `Taximeter Pro - Ritprijsberekening\n\n` +
-      `Van: ${resultaat.startLocatie}\nNaar: ${resultaat.bestemming}\n\n` +
-      `Afstand: ${resultaat.afstandKm.toFixed(1)} km | Reistijd: ${Math.round(resultaat.tijdMin)} min\n` +
-      `Voertuig: ${resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje"}\n\n` +
-      `Uw geschatte ritprijs via Taximeter Pro bedraagt: ${prijs}\n\n` +
-      `(Gebaseerd op wettelijke maximumtarieven 2026.)`;
+      "Taximeter Pro - Ritprijsberekening\n\n" +
+      "Van: " + resultaat.startLocatie + "\nNaar: " + resultaat.bestemming + "\n\n" +
+      "Afstand: " + resultaat.afstandKm.toFixed(1) + " km | Reistijd: " + Math.round(resultaat.tijdMin) + " min\n" +
+      "Voertuig: " + (resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
+      "Uw geschatte ritprijs via Taximeter Pro bedraagt: " + prijs + "\n\n" +
+      "(Gebaseerd op wettelijke maximumtarieven 2026.)";
     try { await Share.share({ message: tekst }); } catch {}
   };
 
@@ -166,7 +166,11 @@ export default function AppScreen() {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: colors.background }}>
       {isDesktop && <DesktopOverlay colors={colors} />}
-      <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: pt, paddingBottom: pb }]} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={[styles.scroll, { paddingTop: pt, paddingBottom: pb }]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.headerRow}>
           <View>
             <Text style={[styles.appTitel, { color: colors.primary }]}>Taximeter Pro</Text>
@@ -174,7 +178,7 @@ export default function AppScreen() {
           </View>
           <View style={[styles.tarievenBadge, { backgroundColor: colors.primary }]}>
             <Text style={[styles.tarievenBadgeTekst, { color: "#000" }]}>
-              {voertuig === "auto" ? `€ ${tarieven.autoKm.toFixed(2)}/km` : `€ ${tarieven.busKm.toFixed(2)}/km`}
+              {voertuig === "auto" ? "€ " + tarieven.autoKm.toFixed(2) + "/km" : "€ " + tarieven.busKm.toFixed(2) + "/km"}
             </Text>
           </View>
         </View>
@@ -183,11 +187,11 @@ export default function AppScreen() {
 
         <View style={styles.modusRow}>
           <TouchableOpacity onPress={() => setModus("api")} style={[styles.modusBtn, { backgroundColor: modus === "api" ? colors.primary : colors.secondary }]} activeOpacity={0.7}>
-            <Feather name="navigation" size={14} color={modus === "api" ? "#000" : colors.mutedForeground} />
+            <MaterialCommunityIcons name="navigation" size={14} color={modus === "api" ? "#000" : colors.mutedForeground} />
             <Text style={[styles.modusT, { color: modus === "api" ? "#000" : colors.mutedForeground }]}>Route opzoeken</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setModus("handmatig")} style={[styles.modusBtn, { backgroundColor: modus === "handmatig" ? colors.primary : colors.secondary }]} activeOpacity={0.7}>
-            <Feather name="edit-3" size={14} color={modus === "handmatig" ? "#000" : colors.mutedForeground} />
+            <MaterialCommunityIcons name="pencil" size={14} color={modus === "handmatig" ? "#000" : colors.mutedForeground} />
             <Text style={[styles.modusT, { color: modus === "handmatig" ? "#000" : colors.mutedForeground }]}>Handmatig</Text>
           </TouchableOpacity>
         </View>
@@ -195,10 +199,10 @@ export default function AppScreen() {
         {modus === "api" ? (
           <View style={{ gap: 10 }}>
             <View style={{ zIndex: 20 }}>
-              <LocatieInput label="Startlocatie" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-pin" toonLocatieKnop />
+              <LocatieInput label="Startlocatie" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-marker" toonLocatieKnop />
             </View>
             <View style={[styles.pijlWrap, { backgroundColor: colors.border }]}>
-              <Feather name="arrow-down" size={16} color={colors.mutedForeground} />
+              <MaterialCommunityIcons name="arrow-down" size={16} color={colors.mutedForeground} />
             </View>
             <View style={{ zIndex: 10 }}>
               <LocatieInput label="Bestemming" waarde={bestemming} onVerander={setBestemming} icoon="flag" />
@@ -207,7 +211,7 @@ export default function AppScreen() {
         ) : (
           <View style={{ gap: 10 }}>
             <View style={{ zIndex: 20 }}>
-              <LocatieInput label="Van (optioneel)" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-pin" toonLocatieKnop />
+              <LocatieInput label="Van (optioneel)" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-marker" toonLocatieKnop />
             </View>
             <View style={{ zIndex: 10 }}>
               <LocatieInput label="Naar (optioneel)" waarde={bestemming} onVerander={setBestemming} icoon="flag" />
@@ -218,9 +222,9 @@ export default function AppScreen() {
 
         <TouchableOpacity onPress={() => setInternationaal(!internationaal)} activeOpacity={0.7}
           style={[styles.intlBtn, { backgroundColor: internationaal ? "#f97316" + "22" : colors.secondary, borderColor: internationaal ? colors.warning : colors.border }]}>
-          <Feather name="globe" size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
+          <MaterialCommunityIcons name="earth" size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
           <Text style={[styles.intlT, { color: internationaal ? colors.warning : colors.mutedForeground }]}>Internationale rit / extra kosten</Text>
-          <Feather name={internationaal ? "chevron-up" : "chevron-down"} size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
+          <MaterialCommunityIcons name={internationaal ? "chevron-up" : "chevron-down"} size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
         </TouchableOpacity>
 
         {internationaal && <ExtraKostenInput kosten={extraKosten} onChange={setExtraKosten} />}
@@ -232,7 +236,7 @@ export default function AppScreen() {
               <Text style={[styles.berekenT, { color: colors.mutedForeground }]}>Route ophalen...</Text>
             ) : (
               <>
-                <Feather name="arrow-right-circle" size={22} color="#000" />
+                <MaterialCommunityIcons name="arrow-right-circle" size={22} color="#000" />
                 <Text style={[styles.berekenT, { color: "#000" }]}>Bereken Ritprijs</Text>
               </>
             )}
@@ -246,11 +250,11 @@ export default function AppScreen() {
               <View style={{ flexDirection: "row", gap: 8 }}>
                 <TouchableOpacity onPress={deelResultaat} activeOpacity={0.7}
                   style={[styles.deelKnop, { backgroundColor: colors.primary + "22", borderColor: colors.primary }]}>
-                  <Feather name="share-2" size={16} color={colors.primary} />
+                  <MaterialCommunityIcons name="share-variant" size={16} color={colors.primary} />
                   <Text style={[styles.deelT, { color: colors.primary }]}>Deel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={reset} style={[styles.resetBtn, { backgroundColor: colors.secondary }]} activeOpacity={0.7}>
-                  <Feather name="refresh-ccw" size={16} color={colors.mutedForeground} />
+                  <MaterialCommunityIcons name="refresh" size={16} color={colors.mutedForeground} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -259,30 +263,38 @@ export default function AppScreen() {
 
             <View style={[styles.routeInfo, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <View style={styles.routeRegel}>
-                <Feather name="map-pin" size={14} color={colors.primary} />
+                <MaterialCommunityIcons name="map-marker" size={14} color={colors.primary} />
                 <Text style={[styles.routeT, { color: colors.foreground }]} numberOfLines={1}>{resultaat.startLocatie}</Text>
               </View>
               <View style={[styles.routeDivider, { backgroundColor: colors.border }]} />
               <View style={styles.routeRegel}>
-                <Feather name="flag" size={14} color={colors.primary} />
+                <MaterialCommunityIcons name="flag" size={14} color={colors.primary} />
                 <Text style={[styles.routeT, { color: colors.foreground }]} numberOfLines={1}>{resultaat.bestemming}</Text>
               </View>
               <View style={styles.statsRij}>
                 <View style={styles.statItem}>
-                  <Feather name="activity" size={13} color={colors.mutedForeground} />
+                  <MaterialCommunityIcons name="chart-line-variant" size={13} color={colors.mutedForeground} />
                   <Text style={[styles.statT, { color: colors.mutedForeground }]}>{resultaat.afstandKm.toFixed(1)} km</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Feather name="clock" size={13} color={colors.mutedForeground} />
+                  <MaterialCommunityIcons name="clock-outline" size={13} color={colors.mutedForeground} />
                   <Text style={[styles.statT, { color: colors.mutedForeground }]}>{Math.round(resultaat.tijdMin)} min</Text>
                 </View>
               </View>
             </View>
 
-            <PrijsDisplay startTarief={resultaat.startTarief} afstandKm={resultaat.afstandKm} kmTarief={resultaat.kmTarief} tijdMin={resultaat.tijdMin} minTarief={resultaat.minTarief} extraKosten={resultaat.extraKosten} totaalPrijs={resultaat.totaalPrijs} />
+            <PrijsDisplay
+              startTarief={resultaat.startTarief}
+              afstandKm={resultaat.afstandKm}
+              kmTarief={resultaat.kmTarief}
+              tijdMin={resultaat.tijdMin}
+              minTarief={resultaat.minTarief}
+              extraKosten={resultaat.extraKosten}
+              totaalPrijs={resultaat.totaalPrijs}
+            />
 
             <View style={[styles.disclaimer, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
-              <Feather name="info" size={13} color={colors.mutedForeground} />
+              <MaterialCommunityIcons name="information" size={13} color={colors.mutedForeground} />
               <Text style={[styles.disclaimerT, { color: colors.mutedForeground }]}>
                 Indicatie op basis van wettelijke maximumtarieven 2026. De taxameter is altijd leidend.
               </Text>

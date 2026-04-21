@@ -1,12 +1,6 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
 import type { ExtraKosten } from "@/context/TaximeterContext";
 
@@ -25,17 +19,13 @@ const PRESET_KOSTEN = [
 
 export function ExtraKostenInput({ kosten, onChange }: Props) {
   const colors = useColors();
-  const [aanpassenIdx, setAanpassenIdx] = useState<number | null>(null);
 
   const voegToe = (preset?: { beschrijving: string; bedrag: number }) => {
     const nieuw: ExtraKosten = preset ?? { beschrijving: "Extra kosten", bedrag: 0 };
     onChange([...kosten, nieuw]);
   };
 
-  const verwijder = (idx: number) => {
-    onChange(kosten.filter((_, i) => i !== idx));
-    if (aanpassenIdx === idx) setAanpassenIdx(null);
-  };
+  const verwijder = (idx: number) => onChange(kosten.filter((_, i) => i !== idx));
 
   const updateBeschrijving = (idx: number, val: string) => {
     const bijgewerkt = [...kosten];
@@ -52,20 +42,12 @@ export function ExtraKostenInput({ kosten, onChange }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Feather name="globe" size={16} color={colors.warning} />
-        <Text style={[styles.titel, { color: colors.foreground }]}>
-          Extra Kosten (internationaal)
-        </Text>
+        <MaterialCommunityIcons name="earth" size={16} color={colors.warning} />
+        <Text style={[styles.titel, { color: colors.foreground }]}>Extra Kosten (internationaal)</Text>
       </View>
 
       {kosten.map((kost, idx) => (
-        <View
-          key={idx}
-          style={[
-            styles.kostItem,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
+        <View key={idx} style={[styles.kostItem, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <TextInput
             value={kost.beschrijving}
             onChangeText={(val) => updateBeschrijving(idx, val)}
@@ -81,7 +63,7 @@ export function ExtraKostenInput({ kosten, onChange }: Props) {
               style={[styles.bedragInput, { color: colors.warning }]}
             />
             <TouchableOpacity onPress={() => verwijder(idx)}>
-              <Feather name="trash-2" size={18} color={colors.destructive} />
+              <MaterialCommunityIcons name="trash-can" size={18} color={colors.destructive} />
             </TouchableOpacity>
           </View>
         </View>
@@ -93,29 +75,18 @@ export function ExtraKostenInput({ kosten, onChange }: Props) {
             key={preset.beschrijving}
             onPress={() => voegToe(preset)}
             activeOpacity={0.7}
-            style={[
-              styles.presetBtn,
-              { backgroundColor: colors.secondary, borderColor: colors.border },
-            ]}
+            style={[styles.presetBtn, { backgroundColor: colors.secondary, borderColor: colors.border }]}
           >
-            <Text style={[styles.presetTekst, { color: colors.foreground }]}>
-              + {preset.beschrijving}
-            </Text>
+            <Text style={[styles.presetTekst, { color: colors.foreground }]}>+ {preset.beschrijving}</Text>
           </TouchableOpacity>
         ))}
-
         <TouchableOpacity
           onPress={() => voegToe()}
           activeOpacity={0.7}
-          style={[
-            styles.presetBtn,
-            { backgroundColor: colors.secondary, borderColor: colors.primary },
-          ]}
+          style={[styles.presetBtn, { backgroundColor: colors.secondary, borderColor: colors.primary }]}
         >
-          <Feather name="plus" size={14} color={colors.primary} />
-          <Text style={[styles.presetTekst, { color: colors.primary }]}>
-            Aangepast bedrag
-          </Text>
+          <MaterialCommunityIcons name="plus" size={14} color={colors.primary} />
+          <Text style={[styles.presetTekst, { color: colors.primary }]}>Aangepast bedrag</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -123,58 +94,18 @@ export function ExtraKostenInput({ kosten, onChange }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 10,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  titel: {
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-  },
-  kostItem: {
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 12,
-    gap: 8,
-  },
-  beschrijvingInput: {
-    fontSize: 14,
-    fontFamily: "Inter_500Medium",
-  },
-  bedragRij: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  euroTeken: {
-    fontSize: 18,
-    fontFamily: "Inter_600SemiBold",
-  },
-  bedragInput: {
-    fontSize: 20,
-    fontFamily: "Inter_700Bold",
-    flex: 1,
-  },
-  presets: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
+  container: { gap: 10 },
+  header: { flexDirection: "row", alignItems: "center", gap: 8 },
+  titel: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
+  kostItem: { borderRadius: 12, borderWidth: 1, padding: 12, gap: 8 },
+  beschrijvingInput: { fontSize: 14, fontFamily: "Inter_500Medium" },
+  bedragRij: { flexDirection: "row", alignItems: "center", gap: 6 },
+  euroTeken: { fontSize: 18, fontFamily: "Inter_600SemiBold" },
+  bedragInput: { fontSize: 20, fontFamily: "Inter_700Bold", flex: 1 },
+  presets: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   presetBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    flexDirection: "row", alignItems: "center", gap: 4,
+    borderRadius: 8, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 6,
   },
-  presetTekst: {
-    fontSize: 12,
-    fontFamily: "Inter_500Medium",
-  },
+  presetTekst: { fontSize: 12, fontFamily: "Inter_500Medium" },
 });

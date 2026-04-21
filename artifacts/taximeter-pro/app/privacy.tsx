@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -51,7 +51,7 @@ export default function PrivacyScreen() {
           style={styles.backBtn}
           activeOpacity={0.7}
         >
-          <Feather name="arrow-left" size={22} color={colors.primary} />
+          <MaterialCommunityIcons name="arrow-left" size={22} color={colors.primary} />
         </TouchableOpacity>
         <Text style={[styles.headerTitel, { color: colors.foreground }]}>
           Privacybeleid
@@ -125,7 +125,7 @@ export default function PrivacyScreen() {
             { backgroundColor: colors.card, borderColor: colors.border },
           ]}
         >
-          <Feather name="shield" size={20} color={colors.primary} />
+          <MaterialCommunityIcons name="shield-check" size={20} color={colors.primary} />
           <Text style={[styles.disclaimerTekst, { color: colors.mutedForeground }]}>
             Taximeter Pro is gebouwd met respect voor uw privacy. De app verwerkt geen persoonsgegevens en is niet aangesloten op enige analysedienst.
           </Text>

@@ -1,16 +1,8 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Linking,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
@@ -18,48 +10,39 @@ import { useColors } from "@/hooks/useColors";
 const FAQ = [
   {
     vraag: "Hoe nauwkeurig is de berekende prijs?",
-    antwoord:
-      "De berekening is gebaseerd op de wettelijke maximumtarieven 2026 en de route-informatie van Google Maps. De werkelijke ritprijs kan licht afwijken door bijvoorbeeld verkeer, omrijden of wachttijd. De taxameter in het voertuig is altijd leidend.",
+    antwoord: "De berekening is gebaseerd op de wettelijke maximumtarieven 2026 en de route-informatie van Google Maps. De werkelijke ritprijs kan licht afwijken door bijvoorbeeld verkeer, omrijden of wachttijd. De taxameter in het voertuig is altijd leidend.",
   },
   {
     vraag: "Zijn dit de officiële wettelijke tarieven?",
-    antwoord:
-      "Ja. De tarieven zijn gebaseerd op de officieel vastgestelde maximumtarieven voor 2026 zoals gepubliceerd door de Nederlandse overheid. Taxichauffeurs mogen nooit meer rekenen dan deze maxima. Tarieven worden doorgaans per 1 januari geïndexeerd.",
+    antwoord: "Ja. De tarieven zijn gebaseerd op de officieel vastgestelde maximumtarieven voor 2026 zoals gepubliceerd door de Nederlandse overheid. Taxichauffeurs mogen nooit meer rekenen dan deze maxima. Tarieven worden doorgaans per 1 januari geïndexeerd.",
   },
   {
     vraag: "Waarom wijkt de prijs af van de taxameter?",
-    antwoord:
-      "De app berekent een schatting op basis van de verwachte route en rijtijd. De taxameter meet de werkelijke gereden afstand en verstreken tijd seconde voor seconde. Verkeer, wachten bij stoplichten of een alternatieve route kunnen een verschil veroorzaken.",
+    antwoord: "De app berekent een schatting op basis van de verwachte route en rijtijd. De taxameter meet de werkelijke gereden afstand en verstreken tijd seconde voor seconde. Verkeer, wachten bij stoplichten of een alternatieve route kunnen een verschil veroorzaken.",
   },
   {
     vraag: "Werkt de app ook zonder internetverbinding?",
-    antwoord:
-      "Ja. Wanneer er geen internetverbinding is, schakelt de app automatisch over naar de handmatige modus. Vul dan zelf de afstand (km) en de reistijd (minuten) in. De prijsberekening werkt volledig offline.",
+    antwoord: "Ja. Wanneer er geen internetverbinding is, schakelt de app automatisch over naar de handmatige modus. Vul dan zelf de afstand (km) en de reistijd (minuten) in. De prijsberekening werkt volledig offline.",
   },
   {
     vraag: "Hoe gebruik ik de GPS-locatiefunctie?",
-    antwoord:
-      "Tik op het kruisje-icoon naast het startlocatieveld. De app vraagt dan om toegang tot uw locatie. Na goedkeuring wordt uw huidige adres automatisch ingevuld als startlocatie.",
+    antwoord: "Tik op het kruisje-icoon naast het startlocatieveld. De app vraagt dan om toegang tot uw locatie. Na goedkeuring wordt uw huidige adres automatisch ingevuld als startlocatie.",
   },
   {
     vraag: "Kan ik de app ook voor internationale ritten gebruiken?",
-    antwoord:
-      "Ja. Tik op 'Internationale rit / extra kosten' om toeslagen toe te voegen, zoals tolkosten voor de A2 of grenstoeslagen voor Duitsland en België. U kunt ook eigen bedragen invoeren.",
+    antwoord: "Ja. Tik op 'Internationale rit / extra kosten' om toeslagen toe te voegen, zoals tolkosten voor de A2 of grenstoeslagen voor Duitsland en Belgie. U kunt ook eigen bedragen invoeren.",
   },
   {
     vraag: "Hoe deel ik een ritprijs met mijn klant?",
-    antwoord:
-      "Na het berekenen van de prijs verschijnt een gele 'Deel'-knop. Tik hierop om de prijsberekening te delen via WhatsApp, SMS of andere apps op uw telefoon. De boodschap bevat route, afstand en het totaalbedrag.",
+    antwoord: "Na het berekenen van de prijs verschijnt een gele 'Deel'-knop. Tik hierop om de prijsberekening te delen via WhatsApp, SMS of andere apps op uw telefoon. De boodschap bevat route, afstand en het totaalbedrag.",
   },
   {
     vraag: "Hoe voeg ik de app toe aan mijn startscherm?",
-    antwoord:
-      "Op Android: open de app in Chrome en tik op de drie puntjes rechtsboven en kies 'Toevoegen aan startscherm'. Op iOS: open de app in Safari en tik op het deel-icoon en kies 'Zet op beginscherm'. De app werkt dan als een native app zonder browser-interface.",
+    antwoord: "Op Android: open de app in Chrome en tik op de drie puntjes rechtsboven en kies 'Toevoegen aan startscherm'. Op iOS: open de app in Safari en tik op het deel-icoon en kies 'Zet op beginscherm'. De app werkt dan als een native app zonder browser-interface.",
   },
   {
     vraag: "Kan ik de tarieven aanpassen als de overheid ze wijzigt?",
-    antwoord:
-      "De tarieven in de app worden centraal beheerd en bijgewerkt bij elke nieuwe indexatie door de overheid. Neem contact op via info@auradigital.nl als u een tariefwijziging wilt melden.",
+    antwoord: "De tarieven in de app worden centraal beheerd en bijgewerkt bij elke nieuwe indexatie door de overheid. Neem contact op via info@auradigital.nl als u een tariefwijziging wilt melden.",
   },
 ];
 
@@ -76,9 +59,7 @@ export default function SupportScreen() {
 
   const stuurEmail = () => {
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL(
-      "mailto:info@auradigital.nl?subject=Support%20Taximeter%20Pro&body=Hallo%20Aura%20Digital%2C%0A%0A"
-    );
+    Linking.openURL("mailto:info@auradigital.nl?subject=Support%20Taximeter%20Pro&body=Hallo%20Aura%20Digital%2C%0A%0A");
   };
 
   const pt = Platform.OS === "web" ? insets.top + 67 : insets.top;
@@ -88,13 +69,13 @@ export default function SupportScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.headerBar, { paddingTop: pt + 8, backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <Feather name="arrow-left" size={22} color={colors.primary} />
+          <MaterialCommunityIcons name="arrow-left" size={22} color={colors.primary} />
         </TouchableOpacity>
         <Text style={[styles.headerTitel, { color: colors.foreground }]}>Support & FAQ</Text>
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: pb + 40 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: pb + 40 }]} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={[styles.contactKaart, { backgroundColor: colors.primary + "22", borderColor: colors.primary }]}>
           <View style={styles.contactKop}>
             <View>
@@ -102,18 +83,18 @@ export default function SupportScreen() {
               <Text style={[styles.contactSub, { color: colors.foreground }]}>Ontwikkelaar van Taximeter Pro</Text>
             </View>
             <View style={[styles.contactIconWrap, { backgroundColor: colors.primary }]}>
-              <Feather name="zap" size={20} color="#000" />
+              <MaterialCommunityIcons name="lightning-bolt" size={20} color="#000" />
             </View>
           </View>
           <TouchableOpacity onPress={stuurEmail} activeOpacity={0.8} style={[styles.emailKnop, { backgroundColor: colors.primary }]}>
-            <Feather name="mail" size={16} color="#000" />
+            <MaterialCommunityIcons name="email" size={16} color="#000" />
             <Text style={styles.emailTekst}>info@auradigital.nl</Text>
           </TouchableOpacity>
           <Text style={[styles.contactInfo, { color: colors.mutedForeground }]}>Reactietijd: doorgaans binnen 1 werkdag</Text>
         </View>
 
         <View style={[styles.klantKaart, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Feather name="briefcase" size={16} color={colors.mutedForeground} />
+          <MaterialCommunityIcons name="briefcase" size={16} color={colors.mutedForeground} />
           <Text style={[styles.klantTekst, { color: colors.mutedForeground }]}>
             Taximeter Pro is een product van{" "}
             <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold" }}>Toygar Consultancy</Text>{" "}
@@ -132,17 +113,15 @@ export default function SupportScreen() {
                   <Text style={[styles.faqNummerTekst, { color: isOpen ? "#000" : colors.mutedForeground }]}>{idx + 1}</Text>
                 </View>
                 <Text style={[styles.faqVraag, { color: isOpen ? colors.primary : colors.foreground }]}>{item.vraag}</Text>
-                <Feather name={isOpen ? "chevron-up" : "chevron-down"} size={16} color={isOpen ? colors.primary : colors.mutedForeground} />
+                <MaterialCommunityIcons name={isOpen ? "chevron-up" : "chevron-down"} size={18} color={isOpen ? colors.primary : colors.mutedForeground} />
               </TouchableOpacity>
-              {isOpen && (
-                <Text style={[styles.faqAntwoord, { color: colors.foreground }]}>{item.antwoord}</Text>
-              )}
+              {isOpen && <Text style={[styles.faqAntwoord, { color: colors.foreground }]}>{item.antwoord}</Text>}
             </View>
           );
         })}
 
         <View style={[styles.footer, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
-          <Feather name="alert-circle" size={13} color={colors.mutedForeground} />
+          <MaterialCommunityIcons name="alert-circle" size={13} color={colors.mutedForeground} />
           <Text style={[styles.footerTekst, { color: colors.mutedForeground }]}>
             Deze prijs is een indicatie op basis van wettelijke maximumtarieven en kan afwijken van de daadwerkelijke taxameter.
           </Text>

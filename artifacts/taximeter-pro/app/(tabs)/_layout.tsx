@@ -3,7 +3,7 @@ import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
 import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { SymbolView } from "expo-symbols";
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
@@ -51,15 +51,9 @@ function ClassicTabLayout() {
         },
         tabBarBackground: () =>
           isIOS ? (
-            <BlurView
-              intensity={100}
-              tint={isDark ? "dark" : "light"}
-              style={StyleSheet.absoluteFill}
-            />
+            <BlurView intensity={100} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
           ) : isWeb ? (
-            <View
-              style={[StyleSheet.absoluteFill, { backgroundColor: colors.card }]}
-            />
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.card }]} />
           ) : null,
       }}
     >
@@ -71,7 +65,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="car.fill" tintColor={color} size={24} />
             ) : (
-              <Feather name="navigation" size={22} color={color} />
+              <MaterialCommunityIcons name="calculator-variant" size={24} color={color} />
             ),
         }}
       />
@@ -83,7 +77,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="clock" tintColor={color} size={24} />
             ) : (
-              <Feather name="clock" size={22} color={color} />
+              <MaterialCommunityIcons name="history" size={24} color={color} />
             ),
         }}
       />
@@ -95,7 +89,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="slider.horizontal.3" tintColor={color} size={24} />
             ) : (
-              <Feather name="sliders" size={22} color={color} />
+              <MaterialCommunityIcons name="tune" size={24} color={color} />
             ),
         }}
       />

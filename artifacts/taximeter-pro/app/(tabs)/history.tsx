@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useState } from "react";
 import {
@@ -26,18 +26,13 @@ export default function GeschiedenisScreen() {
   const [vernieuwen, setVernieuwen] = useState(false);
   const [opengeklapt, setOpengeklapt] = useState<string | null>(null);
 
-  const formatEuro = (val: number) =>
-    "€ " + val.toFixed(2).replace(".", ",");
+  const formatEuro = (val: number) => "€ " + val.toFixed(2).replace(".", ",");
 
   const formatDatum = (ts: number) => {
     const d = new Date(ts);
     return d.toLocaleDateString("nl-NL", {
-      weekday: "short",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      weekday: "short", day: "2-digit", month: "short",
+      year: "numeric", hour: "2-digit", minute: "2-digit",
     });
   };
 
@@ -62,10 +57,8 @@ export default function GeschiedenisScreen() {
       "Afstand: " + item.afstandKm.toFixed(1) + " km | Reistijd: " + Math.round(item.tijdMin) + " min\n" +
       "Voertuig: " + (item.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
       "Uw geschatte ritprijs via Taximeter Pro bedraagt: " + prijs + "\n\n" +
-      "(Gebaseerd op wettelijke maximumtarieven 2026. Definitieve prijs volgens taxameter.)";
-    try {
-      await Share.share({ message: tekst, title: "Taximeter Pro - Ritprijs" });
-    } catch {}
+      "(Gebaseerd op wettelijke maximumtarieven 2026.)";
+    try { await Share.share({ message: tekst, title: "Taximeter Pro - Ritprijs" }); } catch {}
   };
 
   const verwijderRit = (item: RitResultaat) => {
@@ -75,8 +68,7 @@ export default function GeschiedenisScreen() {
       [
         { text: "Annuleren", style: "cancel" },
         {
-          text: "Verwijderen",
-          style: "destructive",
+          text: "Verwijderen", style: "destructive",
           onPress: () => {
             if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
             deleteRit(item.id);
@@ -88,22 +80,17 @@ export default function GeschiedenisScreen() {
   };
 
   const verwijderAlles = () => {
-    Alert.alert(
-      "Alles wissen",
-      "Wil je alle rithistorie definitief verwijderen?",
-      [
-        { text: "Annuleren", style: "cancel" },
-        {
-          text: "Verwijderen",
-          style: "destructive",
-          onPress: () => {
-            if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-            clearHistory();
-            setOpengeklapt(null);
-          },
+    Alert.alert("Alles wissen", "Wil je alle rithistorie definitief verwijderen?", [
+      { text: "Annuleren", style: "cancel" },
+      {
+        text: "Verwijderen", style: "destructive",
+        onPress: () => {
+          if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          clearHistory();
+          setOpengeklapt(null);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const pt = Platform.OS === "web" ? insets.top + 67 : insets.top;
@@ -111,7 +98,6 @@ export default function GeschiedenisScreen() {
 
   const renderItem = ({ item }: { item: RitResultaat }) => {
     const isOpen = opengeklapt === item.id;
-
     return (
       <View style={[styles.ritItem, { backgroundColor: colors.card, borderColor: isOpen ? colors.primary : colors.border }]}>
         <TouchableOpacity onPress={() => toggleAccordion(item.id)} activeOpacity={0.75} style={styles.ritHoofd}>
@@ -122,27 +108,27 @@ export default function GeschiedenisScreen() {
             </View>
             <View style={[styles.routeLijn, { backgroundColor: colors.border }]} />
             <View style={styles.routeRij}>
-              <Feather name="flag" size={12} color={colors.primary} />
+              <MaterialCommunityIcons name="flag" size={12} color={colors.primary} />
               <Text style={[styles.routeTekst, { color: colors.foreground }]} numberOfLines={1}>{item.bestemming}</Text>
             </View>
           </View>
           <View style={styles.ritRechts}>
             <Text style={[styles.ritPrijs, { color: colors.primary }]}>{formatEuro(item.totaalPrijs)}</Text>
-            <Feather name={isOpen ? "chevron-up" : "chevron-down"} size={16} color={colors.mutedForeground} />
+            <MaterialCommunityIcons name={isOpen ? "chevron-up" : "chevron-down"} size={20} color={colors.mutedForeground} />
           </View>
         </TouchableOpacity>
 
         <View style={styles.metaRij}>
           <View style={styles.metaItem}>
-            <Feather name={item.voertuig === "auto" ? "navigation" : "users"} size={12} color={colors.mutedForeground} />
+            <MaterialCommunityIcons name={item.voertuig === "auto" ? "car" : "bus"} size={13} color={colors.mutedForeground} />
             <Text style={[styles.metaTekst, { color: colors.mutedForeground }]}>{item.voertuig === "auto" ? "Auto" : "Bus"}</Text>
           </View>
           <View style={styles.metaItem}>
-            <Feather name="activity" size={12} color={colors.mutedForeground} />
+            <MaterialCommunityIcons name="chart-line-variant" size={13} color={colors.mutedForeground} />
             <Text style={[styles.metaTekst, { color: colors.mutedForeground }]}>{item.afstandKm.toFixed(1)} km</Text>
           </View>
           <View style={styles.metaItem}>
-            <Feather name="clock" size={12} color={colors.mutedForeground} />
+            <MaterialCommunityIcons name="clock-outline" size={13} color={colors.mutedForeground} />
             <Text style={[styles.metaTekst, { color: colors.mutedForeground }]}>{Math.round(item.tijdMin)} min</Text>
           </View>
           <Text style={[styles.datumTekst, { color: colors.mutedForeground }]}>
@@ -154,12 +140,10 @@ export default function GeschiedenisScreen() {
           <View>
             <View style={[styles.accordionDivider, { backgroundColor: colors.border }]} />
 
-            {/* Routekaart */}
-            <View style={{ padding: 14, paddingBottom: 0 }}>
-              <RouteKaart startLocatie={item.startLocatie} bestemming={item.bestemming} hoogte={160} />
+            <View style={{ paddingHorizontal: 14, paddingTop: 14 }}>
+              <RouteKaart startLocatie={item.startLocatie} bestemming={item.bestemming} hoogte={180} />
             </View>
 
-            {/* Prijsopbouw */}
             <View style={styles.prijsDetail}>
               <Text style={[styles.detailKop, { color: colors.mutedForeground }]}>Prijsopbouw</Text>
               <View style={styles.prijsRegel}>
@@ -195,12 +179,12 @@ export default function GeschiedenisScreen() {
             <View style={styles.actiesRij}>
               <TouchableOpacity onPress={() => deelRit(item)} activeOpacity={0.7}
                 style={[styles.actieKnop, { backgroundColor: colors.primary + "22", borderColor: colors.primary }]}>
-                <Feather name="share-2" size={15} color={colors.primary} />
+                <MaterialCommunityIcons name="share-variant" size={15} color={colors.primary} />
                 <Text style={[styles.actieTekst, { color: colors.primary }]}>Delen</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => verwijderRit(item)} activeOpacity={0.7}
                 style={[styles.actieKnop, { backgroundColor: colors.destructive + "22", borderColor: colors.destructive }]}>
-                <Feather name="trash-2" size={15} color={colors.destructive} />
+                <MaterialCommunityIcons name="trash-can" size={15} color={colors.destructive} />
                 <Text style={[styles.actieTekst, { color: colors.destructive }]}>Verwijderen</Text>
               </TouchableOpacity>
             </View>
@@ -217,8 +201,10 @@ export default function GeschiedenisScreen() {
         keyExtractor={(item) => item.id ?? String(item.timestamp)}
         renderItem={renderItem}
         contentContainerStyle={[styles.listContent, { paddingTop: pt + 16, paddingBottom: pb + 100 }]}
+        keyboardShouldPersistTaps="handled"
         refreshControl={
-          <RefreshControl refreshing={vernieuwen} onRefresh={onVernieuwen} tintColor={colors.primary} colors={[colors.primary]} progressBackgroundColor={colors.card} />
+          <RefreshControl refreshing={vernieuwen} onRefresh={onVernieuwen}
+            tintColor={colors.primary} colors={[colors.primary]} progressBackgroundColor={colors.card} />
         }
         ListHeaderComponent={
           <View style={styles.lijstHeader}>
@@ -233,7 +219,7 @@ export default function GeschiedenisScreen() {
             {history.length > 0 && (
               <TouchableOpacity onPress={verwijderAlles} activeOpacity={0.7}
                 style={[styles.wisBtn, { backgroundColor: colors.destructive + "22" }]}>
-                <Feather name="trash-2" size={16} color={colors.destructive} />
+                <MaterialCommunityIcons name="trash-can" size={16} color={colors.destructive} />
               </TouchableOpacity>
             )}
           </View>
@@ -241,7 +227,7 @@ export default function GeschiedenisScreen() {
         ListEmptyComponent={
           <View style={styles.leegState}>
             <View style={[styles.leegIconWrapper, { backgroundColor: colors.card }]}>
-              <Feather name="clock" size={40} color={colors.border} />
+              <MaterialCommunityIcons name="clock-outline" size={40} color={colors.border} />
             </View>
             <Text style={[styles.leegTitel, { color: colors.foreground }]}>Nog geen ritten</Text>
             <Text style={[styles.leegSub, { color: colors.mutedForeground }]}>Berekende ritten verschijnen hier automatisch</Text>
