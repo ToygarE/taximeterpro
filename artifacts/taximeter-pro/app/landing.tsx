@@ -22,8 +22,6 @@ export default function LandingScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  const openApp = () => router.push("/app" as any);
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
@@ -45,34 +43,37 @@ export default function LandingScreen() {
           </Text>
         </View>
 
-        {/* Open App */}
-        <TouchableOpacity onPress={openApp} activeOpacity={0.85} style={[styles.openKnop, { backgroundColor: colors.primary }]}>
-          <MaterialCommunityIcons name="arrow-right-circle" size={22} color="#000" />
-          <Text style={styles.openKnopTekst}>Open de calculator</Text>
-        </TouchableOpacity>
+        {/* Download CTA */}
+        <View style={[styles.downloadBlok, { backgroundColor: colors.primary + "18", borderColor: colors.primary }]}>
+          <MaterialCommunityIcons name="cellphone" size={28} color={colors.primary} />
+          <Text style={[styles.downloadKop, { color: colors.foreground }]}>Download de app</Text>
+          <Text style={[styles.downloadSub, { color: colors.mutedForeground }]}>
+            Taximeter Pro is beschikbaar voor iOS en Android. Download nu gratis en bereken altijd de juiste ritprijs.
+          </Text>
+        </View>
 
         {/* Store badges */}
         <View style={styles.badgesRij}>
           <TouchableOpacity
-            activeOpacity={0.8}
-            style={[styles.storeBadge, { backgroundColor: colors.card, borderColor: colors.border }]}
+            activeOpacity={0.85}
+            style={[styles.storeBadge, { backgroundColor: colors.primary }]}
             onPress={() => Linking.openURL("https://play.google.com/store")}
           >
-            <MaterialCommunityIcons name="cellphone" size={20} color={colors.foreground} />
+            <MaterialCommunityIcons name="google-play" size={22} color="#000" />
             <View>
-              <Text style={[styles.badgeLabel, { color: colors.mutedForeground }]}>Beschikbaar op</Text>
-              <Text style={[styles.badgeNaam, { color: colors.foreground }]}>Google Play</Text>
+              <Text style={styles.badgeLabel}>Beschikbaar op</Text>
+              <Text style={styles.badgeNaam}>Google Play</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            activeOpacity={0.8}
-            style={[styles.storeBadge, { backgroundColor: colors.card, borderColor: colors.border }]}
+            activeOpacity={0.85}
+            style={[styles.storeBadge, { backgroundColor: colors.foreground }]}
             onPress={() => Linking.openURL("https://apps.apple.com")}
           >
-            <MaterialCommunityIcons name="tablet" size={20} color={colors.foreground} />
+            <MaterialCommunityIcons name="apple" size={22} color={colors.background} />
             <View>
               <Text style={[styles.badgeLabel, { color: colors.mutedForeground }]}>Beschikbaar in de</Text>
-              <Text style={[styles.badgeNaam, { color: colors.foreground }]}>App Store</Text>
+              <Text style={[styles.badgeNaam, { color: colors.background }]}>App Store</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -112,10 +113,26 @@ export default function LandingScreen() {
           ))}
         </View>
 
+        {/* Screenshots teaser */}
+        <View style={[styles.teaserCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.teaserContent}>
+            <MaterialCommunityIcons name="shield-check" size={22} color={colors.primary} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.teaserTitel, { color: colors.foreground }]}>Gebouwd voor taxichauffeurs</Text>
+              <Text style={[styles.teaserTekst, { color: colors.mutedForeground }]}>
+                Professioneel hulpmiddel om ritprijzen direct inzichtelijk te maken op basis van de wettelijke Nederlandse maximumtarieven.
+              </Text>
+            </View>
+          </View>
+        </View>
+
         {/* Footer */}
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <Text style={[styles.footerMerk, { color: colors.mutedForeground }]}>
             Taximeter Pro - een product van Toygar Consultancy
+          </Text>
+          <Text style={[styles.footerMerk, { color: colors.mutedForeground }]}>
+            Technisch beheer: Aura Digital
           </Text>
           <View style={styles.footerLinks}>
             <TouchableOpacity onPress={() => router.push("/support" as any)}>
@@ -143,12 +160,18 @@ const styles = StyleSheet.create({
   appNaam: { fontSize: 36, fontFamily: "Inter_700Bold" },
   tagline: { fontSize: 26, fontFamily: "Inter_700Bold", textAlign: "center", lineHeight: 34 },
   subTagline: { fontSize: 15, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 22 },
-  openKnop: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, borderRadius: 16, paddingVertical: 18 },
-  openKnopTekst: { fontSize: 18, fontFamily: "Inter_700Bold", color: "#000" },
+  downloadBlok: {
+    borderRadius: 18, borderWidth: 1, padding: 22, alignItems: "center", gap: 10,
+  },
+  downloadKop: { fontSize: 20, fontFamily: "Inter_700Bold" },
+  downloadSub: { fontSize: 14, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 21, maxWidth: 340 },
   badgesRij: { flexDirection: "row", gap: 12 },
-  storeBadge: { flex: 1, flexDirection: "row", alignItems: "center", gap: 10, borderRadius: 14, borderWidth: 1, padding: 14 },
-  badgeLabel: { fontSize: 10, fontFamily: "Inter_400Regular" },
-  badgeNaam: { fontSize: 14, fontFamily: "Inter_700Bold" },
+  storeBadge: {
+    flex: 1, flexDirection: "row", alignItems: "center", gap: 10,
+    borderRadius: 14, padding: 14,
+  },
+  badgeLabel: { fontSize: 10, fontFamily: "Inter_400Regular", color: "#000" },
+  badgeNaam: { fontSize: 14, fontFamily: "Inter_700Bold", color: "#000" },
   tarievenCard: { borderRadius: 16, borderWidth: 1, padding: 16, gap: 12 },
   tarievenKop: { fontSize: 14, fontFamily: "Inter_700Bold", textAlign: "center" },
   tarievenRij: { flexDirection: "row", alignItems: "center" },
@@ -162,6 +185,10 @@ const styles = StyleSheet.create({
   functieIcon: { width: 40, height: 40, borderRadius: 10, alignItems: "center", justifyContent: "center" },
   functieTitel: { fontSize: 15, fontFamily: "Inter_700Bold" },
   functieTekst: { fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 19 },
+  teaserCard: { borderRadius: 14, borderWidth: 1, padding: 16 },
+  teaserContent: { flexDirection: "row", gap: 14, alignItems: "flex-start" },
+  teaserTitel: { fontSize: 15, fontFamily: "Inter_700Bold", marginBottom: 4 },
+  teaserTekst: { fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 19 },
   footer: { borderTopWidth: 1, paddingTop: 24, gap: 10, alignItems: "center" },
   footerMerk: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "center" },
   footerLinks: { flexDirection: "row", alignItems: "center", gap: 8 },

@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { Redirect } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -97,6 +98,10 @@ export default function AppScreen() {
   useEffect(() => {
     if (!isOnline && modus === "api") setModus("handmatig");
   }, [isOnline]);
+
+  if (Platform.OS === "web") {
+    return <Redirect href="/landing" />;
+  }
 
   const berekenScale = new Animated.Value(1);
   const animeerKnop = () => {
