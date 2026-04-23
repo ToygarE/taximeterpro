@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import {
@@ -146,7 +146,7 @@ export default function CalculatorScreen() {
           <View style={styles.headerRechts}>
             {!isOnline && (
               <View style={[styles.offlineBadge, { backgroundColor: colors.warning + "22", borderColor: colors.warning }]}>
-                <MaterialCommunityIcons name="wifi-off" size={12} color={colors.warning} />
+                <Ionicons name="cloud-offline-outline" size={12} color={colors.warning} />
                 <Text style={[styles.offlineTekst, { color: colors.warning }]}>Offline</Text>
               </View>
             )}
@@ -171,7 +171,7 @@ export default function CalculatorScreen() {
             style={[styles.modusBtn, { backgroundColor: modus === "api" ? colors.primary : colors.secondary, opacity: !isOnline ? 0.4 : 1 }]}
             activeOpacity={0.7}
           >
-            <MaterialCommunityIcons name="navigation" size={16} color={modus === "api" ? colors.primaryForeground : colors.mutedForeground} />
+            <Ionicons name="navigate-outline" size={16} color={modus === "api" ? colors.primaryForeground : colors.mutedForeground} />
             <Text style={[styles.modus, { color: modus === "api" ? colors.primaryForeground : colors.mutedForeground }]}>Route opzoeken</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -179,7 +179,7 @@ export default function CalculatorScreen() {
             style={[styles.modusBtn, { backgroundColor: modus === "handmatig" ? colors.primary : colors.secondary }]}
             activeOpacity={0.7}
           >
-            <MaterialCommunityIcons name="pencil" size={16} color={modus === "handmatig" ? colors.primaryForeground : colors.mutedForeground} />
+            <Ionicons name="create-outline" size={16} color={modus === "handmatig" ? colors.primaryForeground : colors.mutedForeground} />
             <Text style={[styles.modus, { color: modus === "handmatig" ? colors.primaryForeground : colors.mutedForeground }]}>Handmatig</Text>
           </TouchableOpacity>
         </View>
@@ -188,22 +188,22 @@ export default function CalculatorScreen() {
         {modus === "api" ? (
           <View style={styles.sectie}>
             <View style={{ zIndex: 20 }}>
-              <LocatieInput label="Startlocatie" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-marker" toonLocatieKnop />
+              <LocatieInput label="Startlocatie" waarde={startLocatie} onVerander={setStartLocatie} icoon="location-outline" toonLocatieKnop />
             </View>
             <View style={[styles.routePijl, { backgroundColor: colors.border }]}>
-              <MaterialCommunityIcons name="arrow-down" size={16} color={colors.mutedForeground} />
+              <Ionicons name="arrow-down-outline" size={16} color={colors.mutedForeground} />
             </View>
             <View style={{ zIndex: 10 }}>
-              <LocatieInput label="Bestemming" waarde={bestemming} onVerander={setBestemming} icoon="flag" />
+              <LocatieInput label="Bestemming" waarde={bestemming} onVerander={setBestemming} icoon="flag-outline" />
             </View>
           </View>
         ) : (
           <View style={styles.sectie}>
             <View style={{ flex: 1, zIndex: 20 }}>
-              <LocatieInput label="Van (optioneel)" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-marker" toonLocatieKnop />
+              <LocatieInput label="Van (optioneel)" waarde={startLocatie} onVerander={setStartLocatie} icoon="location-outline" toonLocatieKnop />
             </View>
             <View style={{ zIndex: 10 }}>
-              <LocatieInput label="Naar (optioneel)" waarde={bestemming} onVerander={setBestemming} icoon="flag" />
+              <LocatieInput label="Naar (optioneel)" waarde={bestemming} onVerander={setBestemming} icoon="flag-outline" />
             </View>
             <HandmatigInput kmWaarde={handmatigKm} onKmVerander={setHandmatigKm} minWaarde={handmatigMin} onMinVerander={setHandmatigMin} />
           </View>
@@ -215,11 +215,11 @@ export default function CalculatorScreen() {
           activeOpacity={0.7}
           style={[styles.internationaalBtn, { backgroundColor: internationaal ? "#f97316" + "22" : colors.secondary, borderColor: internationaal ? colors.warning : colors.border }]}
         >
-          <MaterialCommunityIcons name="earth" size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
+          <Ionicons name="earth-outline" size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
           <Text style={[styles.internationaalTekst, { color: internationaal ? colors.warning : colors.mutedForeground }]}>
             Internationale rit / extra kosten
           </Text>
-          <MaterialCommunityIcons name={internationaal ? "chevron-up" : "chevron-down"} size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
+          <Ionicons name={internationaal ? "chevron-up-outline" : "chevron-down-outline"} size={16} color={internationaal ? colors.warning : colors.mutedForeground} />
         </TouchableOpacity>
 
         {internationaal && <ExtraKostenInput kosten={extraKosten} onChange={setExtraKosten} />}
@@ -236,7 +236,7 @@ export default function CalculatorScreen() {
               <Text style={[styles.berekenTekst, { color: colors.mutedForeground }]}>Route ophalen...</Text>
             ) : (
               <>
-                <MaterialCommunityIcons name="arrow-right-circle" size={24} color={colors.primaryForeground} />
+                <Ionicons name="arrow-forward-circle-outline" size={24} color={colors.primaryForeground} />
                 <Text style={[styles.berekenTekst, { color: colors.primaryForeground }]}>Bereken Ritprijs</Text>
               </>
             )}
@@ -251,11 +251,11 @@ export default function CalculatorScreen() {
               <View style={styles.resultaatActies}>
                 <TouchableOpacity onPress={deelResultaat} activeOpacity={0.7}
                   style={[styles.deelKnop, { backgroundColor: colors.primary + "22", borderColor: colors.primary }]}>
-                  <MaterialCommunityIcons name="share-variant" size={16} color={colors.primary} />
+                  <Ionicons name="share-social-outline" size={16} color={colors.primary} />
                   <Text style={[styles.deelTekst, { color: colors.primary }]}>Deel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={reset} style={[styles.resetBtn, { backgroundColor: colors.secondary }]} activeOpacity={0.7}>
-                  <MaterialCommunityIcons name="refresh" size={16} color={colors.mutedForeground} />
+                  <Ionicons name="refresh-outline" size={16} color={colors.mutedForeground} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -265,25 +265,25 @@ export default function CalculatorScreen() {
 
             <View style={[styles.routeInfo, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <View style={styles.routeRegel}>
-                <MaterialCommunityIcons name="map-marker" size={14} color={colors.primary} />
+                <Ionicons name="location-outline" size={14} color={colors.primary} />
                 <Text style={[styles.routeTekst, { color: colors.foreground }]} numberOfLines={1}>{resultaat.startLocatie}</Text>
               </View>
               <View style={[styles.routeDivider, { backgroundColor: colors.border }]} />
               <View style={styles.routeRegel}>
-                <MaterialCommunityIcons name="flag" size={14} color={colors.primary} />
+                <Ionicons name="flag-outline" size={14} color={colors.primary} />
                 <Text style={[styles.routeTekst, { color: colors.foreground }]} numberOfLines={1}>{resultaat.bestemming}</Text>
               </View>
               <View style={styles.statsRij}>
                 <View style={styles.statItem}>
-                  <MaterialCommunityIcons name="chart-line-variant" size={13} color={colors.mutedForeground} />
+                  <Ionicons name="stats-chart-outline" size={13} color={colors.mutedForeground} />
                   <Text style={[styles.statTekst, { color: colors.mutedForeground }]}>{resultaat.afstandKm.toFixed(1)} km</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <MaterialCommunityIcons name="clock-outline" size={13} color={colors.mutedForeground} />
+                  <Ionicons name="time-outline" size={13} color={colors.mutedForeground} />
                   <Text style={[styles.statTekst, { color: colors.mutedForeground }]}>{Math.round(resultaat.tijdMin)} min</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <MaterialCommunityIcons name={resultaat.voertuig === "auto" ? "car" : "bus"} size={13} color={colors.mutedForeground} />
+                  <Ionicons name={resultaat.voertuig === "auto" ? "car-outline" : "bus-outline"} size={13} color={colors.mutedForeground} />
                   <Text style={[styles.statTekst, { color: colors.mutedForeground }]}>
                     {resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje"}
                   </Text>
@@ -302,7 +302,7 @@ export default function CalculatorScreen() {
             />
 
             <View style={[styles.disclaimerCard, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
-              <MaterialCommunityIcons name="information" size={13} color={colors.mutedForeground} />
+              <Ionicons name="information-circle-outline" size={13} color={colors.mutedForeground} />
               <Text style={[styles.disclaimerTekst, { color: colors.mutedForeground }]}>
                 Deze prijs is een indicatie op basis van wettelijke maximumtarieven en kan afwijken van de daadwerkelijke taxameter.
               </Text>

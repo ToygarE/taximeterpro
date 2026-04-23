@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
@@ -13,9 +13,9 @@ interface Props {
 export function VoertuigSelector({ value, onChange }: Props) {
   const colors = useColors();
 
-  const opties: { key: Voertuig; label: string; sub: string; icon: "car" | "bus" }[] = [
-    { key: "auto", label: "Personenauto", sub: "max. 4 personen", icon: "car" },
-    { key: "bus", label: "Taxibusje", sub: "5-8 personen", icon: "bus" },
+  const opties: { key: Voertuig; label: string; sub: string; icon: "car-outline" | "bus-outline" }[] = [
+    { key: "auto", label: "Personenauto", sub: "max. 4 personen", icon: "car-outline" },
+    { key: "bus", label: "Taxibusje", sub: "5-8 personen", icon: "bus-outline" },
   ];
 
   return (
@@ -35,7 +35,7 @@ export function VoertuigSelector({ value, onChange }: Props) {
               },
             ]}
           >
-            <MaterialCommunityIcons
+            <Ionicons
               name={opt.icon}
               size={24}
               color={actief ? colors.primaryForeground : colors.mutedForeground}

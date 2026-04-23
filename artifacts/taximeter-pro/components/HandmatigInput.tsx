@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
@@ -26,7 +26,7 @@ export function HandmatigInput({ kmWaarde, onKmVerander, minWaarde, onMinVerande
         <View style={styles.numRow}>
           <TouchableOpacity onPress={decrement} activeOpacity={0.7}
             style={[styles.numBtn, { backgroundColor: colors.secondary }]}>
-            <MaterialCommunityIcons name="minus" size={22} color={colors.foreground} />
+            <Ionicons name="remove-outline" size={22} color={colors.foreground} />
           </TouchableOpacity>
           <View style={styles.inputWrapper}>
             <TextInput
@@ -40,7 +40,7 @@ export function HandmatigInput({ kmWaarde, onKmVerander, minWaarde, onMinVerande
           </View>
           <TouchableOpacity onPress={increment} activeOpacity={0.7}
             style={[styles.numBtn, { backgroundColor: colors.secondary }]}>
-            <MaterialCommunityIcons name="plus" size={22} color={colors.foreground} />
+            <Ionicons name="add-outline" size={22} color={colors.foreground} />
           </TouchableOpacity>
         </View>
       </View>

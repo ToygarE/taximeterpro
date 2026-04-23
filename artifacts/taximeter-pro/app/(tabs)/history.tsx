@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useState } from "react";
 import {
@@ -108,27 +108,27 @@ export default function GeschiedenisScreen() {
             </View>
             <View style={[styles.routeLijn, { backgroundColor: colors.border }]} />
             <View style={styles.routeRij}>
-              <MaterialCommunityIcons name="flag" size={12} color={colors.primary} />
+              <Ionicons name="flag-outline" size={12} color={colors.primary} />
               <Text style={[styles.routeTekst, { color: colors.foreground }]} numberOfLines={1}>{item.bestemming}</Text>
             </View>
           </View>
           <View style={styles.ritRechts}>
             <Text style={[styles.ritPrijs, { color: colors.primary }]}>{formatEuro(item.totaalPrijs)}</Text>
-            <MaterialCommunityIcons name={isOpen ? "chevron-up" : "chevron-down"} size={20} color={colors.mutedForeground} />
+            <Ionicons name={isOpen ? "chevron-up-outline" : "chevron-down-outline"} size={20} color={colors.mutedForeground} />
           </View>
         </TouchableOpacity>
 
         <View style={styles.metaRij}>
           <View style={styles.metaItem}>
-            <MaterialCommunityIcons name={item.voertuig === "auto" ? "car" : "bus"} size={13} color={colors.mutedForeground} />
+            <Ionicons name={item.voertuig === "auto" ? "car-outline" : "bus-outline"} size={13} color={colors.mutedForeground} />
             <Text style={[styles.metaTekst, { color: colors.mutedForeground }]}>{item.voertuig === "auto" ? "Auto" : "Bus"}</Text>
           </View>
           <View style={styles.metaItem}>
-            <MaterialCommunityIcons name="chart-line-variant" size={13} color={colors.mutedForeground} />
+            <Ionicons name="stats-chart-outline" size={13} color={colors.mutedForeground} />
             <Text style={[styles.metaTekst, { color: colors.mutedForeground }]}>{item.afstandKm.toFixed(1)} km</Text>
           </View>
           <View style={styles.metaItem}>
-            <MaterialCommunityIcons name="clock-outline" size={13} color={colors.mutedForeground} />
+            <Ionicons name="time-outline" size={13} color={colors.mutedForeground} />
             <Text style={[styles.metaTekst, { color: colors.mutedForeground }]}>{Math.round(item.tijdMin)} min</Text>
           </View>
           <Text style={[styles.datumTekst, { color: colors.mutedForeground }]}>
@@ -179,12 +179,12 @@ export default function GeschiedenisScreen() {
             <View style={styles.actiesRij}>
               <TouchableOpacity onPress={() => deelRit(item)} activeOpacity={0.7}
                 style={[styles.actieKnop, { backgroundColor: colors.primary + "22", borderColor: colors.primary }]}>
-                <MaterialCommunityIcons name="share-variant" size={15} color={colors.primary} />
+                <Ionicons name="share-social-outline" size={15} color={colors.primary} />
                 <Text style={[styles.actieTekst, { color: colors.primary }]}>Delen</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => verwijderRit(item)} activeOpacity={0.7}
                 style={[styles.actieKnop, { backgroundColor: colors.destructive + "22", borderColor: colors.destructive }]}>
-                <MaterialCommunityIcons name="trash-can" size={15} color={colors.destructive} />
+                <Ionicons name="trash-outline" size={15} color={colors.destructive} />
                 <Text style={[styles.actieTekst, { color: colors.destructive }]}>Verwijderen</Text>
               </TouchableOpacity>
             </View>
@@ -219,7 +219,7 @@ export default function GeschiedenisScreen() {
             {history.length > 0 && (
               <TouchableOpacity onPress={verwijderAlles} activeOpacity={0.7}
                 style={[styles.wisBtn, { backgroundColor: colors.destructive + "22" }]}>
-                <MaterialCommunityIcons name="trash-can" size={16} color={colors.destructive} />
+                <Ionicons name="trash-outline" size={16} color={colors.destructive} />
               </TouchableOpacity>
             )}
           </View>
@@ -227,7 +227,7 @@ export default function GeschiedenisScreen() {
         ListEmptyComponent={
           <View style={styles.leegState}>
             <View style={[styles.leegIconWrapper, { backgroundColor: colors.card }]}>
-              <MaterialCommunityIcons name="clock-outline" size={40} color={colors.border} />
+              <Ionicons name="time-outline" size={40} color={colors.border} />
             </View>
             <Text style={[styles.leegTitel, { color: colors.foreground }]}>Nog geen ritten</Text>
             <Text style={[styles.leegSub, { color: colors.mutedForeground }]}>Berekende ritten verschijnen hier automatisch</Text>

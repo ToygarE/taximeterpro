@@ -1,5 +1,5 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
 import type { ExtraKosten } from "@/context/TaximeterContext";
@@ -42,7 +42,7 @@ export function ExtraKostenInput({ kosten, onChange }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <MaterialCommunityIcons name="earth" size={16} color={colors.warning} />
+        <Ionicons name="earth-outline" size={16} color={colors.warning} />
         <Text style={[styles.titel, { color: colors.foreground }]}>Extra Kosten (internationaal)</Text>
       </View>
 
@@ -63,7 +63,7 @@ export function ExtraKostenInput({ kosten, onChange }: Props) {
               style={[styles.bedragInput, { color: colors.warning }]}
             />
             <TouchableOpacity onPress={() => verwijder(idx)}>
-              <MaterialCommunityIcons name="trash-can" size={18} color={colors.destructive} />
+              <Ionicons name="trash-outline" size={18} color={colors.destructive} />
             </TouchableOpacity>
           </View>
         </View>
@@ -85,7 +85,7 @@ export function ExtraKostenInput({ kosten, onChange }: Props) {
           activeOpacity={0.7}
           style={[styles.presetBtn, { backgroundColor: colors.secondary, borderColor: colors.primary }]}
         >
-          <MaterialCommunityIcons name="plus" size={14} color={colors.primary} />
+          <Ionicons name="add-outline" size={14} color={colors.primary} />
           <Text style={[styles.presetTekst, { color: colors.primary }]}>Aangepast bedrag</Text>
         </TouchableOpacity>
       </View>

@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -6,15 +6,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
 
-type IconName = "navigation" | "credit-card-outline" | "account-group" | "earth" | "clock-outline" | "wifi-off";
 
-const FUNCTIES: { icoon: IconName; titel: string; tekst: string }[] = [
-  { icoon: "navigation", titel: "Straatniveau autocomplete", tekst: "Typ een adres met huisnummer en ontvang directe suggesties via Google Maps." },
-  { icoon: "credit-card-outline", titel: "Wettelijke tarieven 2026", tekst: "Berekend op basis van de officieel vastgestelde maximumtarieven van de overheid." },
-  { icoon: "account-group", titel: "Auto & Taxibusje", tekst: "Ondersteunt personenauto (max. 4 pers.) en taxibusje (5-8 pers.)." },
-  { icoon: "earth", titel: "Internationale ritten", tekst: "Voeg tolkosten, grenstoeslagen en andere extra's toe aan uw berekening." },
-  { icoon: "clock-outline", titel: "Ritgeschiedenis", tekst: "Bewaar en deel uitgevoerde berekeningen, inclusief volledige prijsopbouw." },
-  { icoon: "wifi-off", titel: "Offline modus", tekst: "Werkt volledig zonder internet via handmatige km- en tijdinvoer." },
+const FUNCTIES: { icoon: string; titel: string; tekst: string }[] = [
+  { icoon: "navigate-outline", titel: "Straatniveau autocomplete", tekst: "Typ een adres met huisnummer en ontvang directe suggesties via Google Maps." },
+  { icoon: "card-outline", titel: "Wettelijke tarieven 2026", tekst: "Berekend op basis van de officieel vastgestelde maximumtarieven van de overheid." },
+  { icoon: "people-outline", titel: "Auto & Taxibusje", tekst: "Ondersteunt personenauto (max. 4 pers.) en taxibusje (5-8 pers.)." },
+  { icoon: "earth-outline", titel: "Internationale ritten", tekst: "Voeg tolkosten, grenstoeslagen en andere extra's toe aan uw berekening." },
+  { icoon: "time-outline", titel: "Ritgeschiedenis", tekst: "Bewaar en deel uitgevoerde berekeningen, inclusief volledige prijsopbouw." },
+  { icoon: "cloud-offline-outline", titel: "Offline modus", tekst: "Werkt volledig zonder internet via handmatige km- en tijdinvoer." },
 ];
 
 export default function LandingScreen() {
@@ -32,7 +31,7 @@ export default function LandingScreen() {
         {/* Hero */}
         <View style={styles.hero}>
           <View style={[styles.logoBadge, { backgroundColor: colors.primary }]}>
-            <MaterialCommunityIcons name="navigation" size={32} color="#000" />
+            <Ionicons name="navigate-outline" size={32} color="#000" />
           </View>
           <Text style={[styles.appNaam, { color: colors.primary }]}>Taximeter Pro</Text>
           <Text style={[styles.tagline, { color: colors.foreground }]}>
@@ -45,7 +44,7 @@ export default function LandingScreen() {
 
         {/* Download CTA */}
         <View style={[styles.downloadBlok, { backgroundColor: colors.primary + "18", borderColor: colors.primary }]}>
-          <MaterialCommunityIcons name="cellphone" size={28} color={colors.primary} />
+          <Ionicons name="phone-portrait-outline" size={28} color={colors.primary} />
           <Text style={[styles.downloadKop, { color: colors.foreground }]}>Download de app</Text>
           <Text style={[styles.downloadSub, { color: colors.mutedForeground }]}>
             Taximeter Pro is beschikbaar voor iOS en Android. Download nu gratis en bereken altijd de juiste ritprijs.
@@ -59,7 +58,7 @@ export default function LandingScreen() {
             style={[styles.storeBadge, { backgroundColor: colors.primary }]}
             onPress={() => Linking.openURL("https://play.google.com/store")}
           >
-            <MaterialCommunityIcons name="google-play" size={22} color="#000" />
+            <Ionicons name="logo-android" size={22} color="#000" />
             <View>
               <Text style={styles.badgeLabel}>Beschikbaar op</Text>
               <Text style={styles.badgeNaam}>Google Play</Text>
@@ -70,7 +69,7 @@ export default function LandingScreen() {
             style={[styles.storeBadge, { backgroundColor: colors.foreground }]}
             onPress={() => Linking.openURL("https://apps.apple.com")}
           >
-            <MaterialCommunityIcons name="apple" size={22} color={colors.background} />
+            <Ionicons name="logo-apple" size={22} color={colors.background} />
             <View>
               <Text style={[styles.badgeLabel, { color: colors.mutedForeground }]}>Beschikbaar in de</Text>
               <Text style={[styles.badgeNaam, { color: colors.background }]}>App Store</Text>
@@ -105,7 +104,7 @@ export default function LandingScreen() {
           {FUNCTIES.map((f, idx) => (
             <View key={idx} style={[styles.functieKaart, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <View style={[styles.functieIcon, { backgroundColor: colors.primary + "22" }]}>
-                <MaterialCommunityIcons name={f.icoon} size={20} color={colors.primary} />
+                <Ionicons name={f.icoon as any} size={20} color={colors.primary} />
               </View>
               <Text style={[styles.functieTitel, { color: colors.foreground }]}>{f.titel}</Text>
               <Text style={[styles.functieTekst, { color: colors.mutedForeground }]}>{f.tekst}</Text>
@@ -116,7 +115,7 @@ export default function LandingScreen() {
         {/* Screenshots teaser */}
         <View style={[styles.teaserCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.teaserContent}>
-            <MaterialCommunityIcons name="shield-check" size={22} color={colors.primary} />
+            <Ionicons name="shield-checkmark-outline" size={22} color={colors.primary} />
             <View style={{ flex: 1 }}>
               <Text style={[styles.teaserTitel, { color: colors.foreground }]}>Gebouwd voor taxichauffeurs</Text>
               <Text style={[styles.teaserTekst, { color: colors.mutedForeground }]}>
@@ -129,7 +128,7 @@ export default function LandingScreen() {
         {/* Footer */}
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <Text style={[styles.footerMerk, { color: colors.mutedForeground }]}>
-            Taximeter Pro - een product van Toygar Consultancy
+            Taximeter Pro - een product van Aura Digital
           </Text>
           <Text style={[styles.footerMerk, { color: colors.mutedForeground }]}>
             Technisch beheer: Aura Digital

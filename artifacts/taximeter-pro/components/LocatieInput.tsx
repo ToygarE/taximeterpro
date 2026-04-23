@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import React, { useCallback, useRef, useState } from "react";
 import {
@@ -63,7 +63,7 @@ export function LocatieInput({
   label,
   waarde,
   onVerander,
-  icoon = "map-marker",
+  icoon = "location-outline",
   toonLocatieKnop = false,
 }: Props) {
   const colors = useColors();
@@ -225,7 +225,6 @@ export function LocatieInput({
 
   return (
     <View style={styles.wrapper}>
-      {/* Input field */}
       <View
         style={[
           styles.container,
@@ -235,7 +234,7 @@ export function LocatieInput({
           },
         ]}
       >
-        <MaterialCommunityIcons
+        <Ionicons
           name={icoon as any}
           size={18}
           color={gefocust ? colors.primary : colors.mutedForeground}
@@ -269,8 +268,8 @@ export function LocatieInput({
               onPress={wis}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <MaterialCommunityIcons
-                name="close-circle"
+              <Ionicons
+                name="close-circle-outline"
                 size={17}
                 color={colors.mutedForeground}
               />
@@ -281,26 +280,18 @@ export function LocatieInput({
               onPress={gebruikHuidigeLocatie}
               disabled={loadingLocatie}
               hitSlop={{ top: 10, bottom: 10, left: 6, right: 6 }}
-              style={[
-                styles.gpsBtn,
-                { backgroundColor: colors.primary + "22" },
-              ]}
+              style={[styles.gpsBtn, { backgroundColor: colors.primary + "22" }]}
             >
               {loadingLocatie ? (
                 <ActivityIndicator size="small" color={colors.primary} />
               ) : (
-                <MaterialCommunityIcons
-                  name="crosshairs-gps"
-                  size={16}
-                  color={colors.primary}
-                />
+                <Ionicons name="locate-outline" size={16} color={colors.primary} />
               )}
             </TouchableOpacity>
           )}
         </View>
       </View>
 
-      {/* Dropdown — absolute positioned, no Modal (prevents keyboard dismissal on Android) */}
       {toonDropdown && (
         <View
           style={[
@@ -328,8 +319,7 @@ export function LocatieInput({
               <TouchableOpacity
                 onPressIn={() => {
                   isSelectingRef.current = true;
-                  if (blurTimeoutRef.current)
-                    clearTimeout(blurTimeoutRef.current);
+                  if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
                 }}
                 onPress={() => kiesSuggestie(item)}
                 activeOpacity={0.7}
@@ -341,47 +331,23 @@ export function LocatieInput({
                   },
                 ]}
               >
-                <View
-                  style={[
-                    styles.suggestieIcon,
-                    { backgroundColor: colors.primary + "22" },
-                  ]}
-                >
-                  <MaterialCommunityIcons
-                    name="map-marker"
-                    size={13}
-                    color={colors.primary}
-                  />
+                <View style={[styles.suggestieIcon, { backgroundColor: colors.primary + "22" }]}>
+                  <Ionicons name="location-outline" size={13} color={colors.primary} />
                 </View>
                 <Text
-                  style={[
-                    styles.suggestieTekst,
-                    { color: colors.foreground },
-                  ]}
+                  style={[styles.suggestieTekst, { color: colors.foreground }]}
                   numberOfLines={2}
                 >
                   {item.description}
                 </Text>
-                <MaterialCommunityIcons
-                  name="arrow-top-left"
-                  size={13}
-                  color={colors.mutedForeground}
-                />
+                <Ionicons name="return-up-back-outline" size={13} color={colors.mutedForeground} />
               </TouchableOpacity>
             )}
           />
           {!GOOGLE_API_KEY && (
-            <View
-              style={[styles.demoRij, { borderTopColor: colors.border }]}
-            >
-              <MaterialCommunityIcons
-                name="information"
-                size={11}
-                color={colors.mutedForeground}
-              />
-              <Text
-                style={[styles.demoTekst, { color: colors.mutedForeground }]}
-              >
+            <View style={[styles.demoRij, { borderTopColor: colors.border }]}>
+              <Ionicons name="information-circle-outline" size={11} color={colors.mutedForeground} />
+              <Text style={[styles.demoTekst, { color: colors.mutedForeground }]}>
                 Demo-modus - voeg Google Maps API-sleutel toe
               </Text>
             </View>
@@ -393,83 +359,29 @@ export function LocatieInput({
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    position: "relative",
-    zIndex: 1,
-  },
+  wrapper: { position: "relative", zIndex: 1 },
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 14,
-    borderWidth: 2,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    gap: 10,
+    flexDirection: "row", alignItems: "center", borderRadius: 14,
+    borderWidth: 2, paddingHorizontal: 14, paddingVertical: 12, gap: 10,
   },
   inputArea: { flex: 1 },
   labelTekst: {
-    fontSize: 10,
-    fontFamily: "Inter_500Medium",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: 3,
+    fontSize: 10, fontFamily: "Inter_500Medium",
+    textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3,
   },
-  input: {
-    fontSize: 16,
-    fontFamily: "Inter_500Medium",
-    padding: 0,
-    margin: 0,
-  },
+  input: { fontSize: 16, fontFamily: "Inter_500Medium", padding: 0, margin: 0 },
   rechts: { flexDirection: "row", alignItems: "center", gap: 8 },
-  gpsBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  gpsBtn: { width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center" },
   dropdown: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
-    marginTop: 6,
-    borderRadius: 14,
-    borderWidth: 1,
-    overflow: "hidden",
-    zIndex: 9999,
+    position: "absolute", top: "100%", left: 0, right: 0, marginTop: 6,
+    borderRadius: 14, borderWidth: 1, overflow: "hidden", zIndex: 9999,
   },
   suggestieRij: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    flexDirection: "row", alignItems: "center", gap: 10,
+    paddingHorizontal: 14, paddingVertical: 13,
   },
-  suggestieIcon: {
-    width: 26,
-    height: 26,
-    borderRadius: 7,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  suggestieTekst: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    flex: 1,
-  },
-  demoRij: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-  },
-  demoTekst: {
-    fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    flex: 1,
-  },
+  suggestieIcon: { width: 26, height: 26, borderRadius: 7, alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  suggestieTekst: { fontSize: 13, fontFamily: "Inter_400Regular", flex: 1 },
+  demoRij: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderTopWidth: 1 },
+  demoTekst: { fontSize: 11, fontFamily: "Inter_400Regular", flex: 1 },
 });

@@ -3,7 +3,7 @@ import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
 import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { SymbolView } from "expo-symbols";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
@@ -65,7 +65,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="car.fill" tintColor={color} size={24} />
             ) : (
-              <MaterialCommunityIcons name="calculator-variant" size={24} color={color} />
+              <Ionicons name="calculator-outline" size={24} color={color} />
             ),
         }}
       />
@@ -77,7 +77,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="clock" tintColor={color} size={24} />
             ) : (
-              <MaterialCommunityIcons name="history" size={24} color={color} />
+              <Ionicons name="time-outline" size={24} color={color} />
             ),
         }}
       />
@@ -89,7 +89,7 @@ function ClassicTabLayout() {
             isIOS ? (
               <SymbolView name="slider.horizontal.3" tintColor={color} size={24} />
             ) : (
-              <MaterialCommunityIcons name="tune" size={24} color={color} />
+              <Ionicons name="options-outline" size={24} color={color} />
             ),
         }}
       />

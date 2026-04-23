@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -68,7 +68,7 @@ export default function TarievenScreen() {
       </View>
 
       <View style={[styles.infoBanner, { backgroundColor: colors.primary + "22", borderColor: colors.primary }]}>
-        <MaterialCommunityIcons name="information" size={16} color={colors.primary} />
+        <Ionicons name="information-circle-outline" size={16} color={colors.primary} />
         <Text style={[styles.infoTekst, { color: colors.primary }]}>
           De overheid indexeert de maximumtarieven doorgaans per 1 januari. Neem contact op met support als de tarieven zijn gewijzigd.
         </Text>
@@ -106,10 +106,10 @@ export default function TarievenScreen() {
           style={[styles.juridischRij, { borderBottomColor: colors.border, borderBottomWidth: 1 }]}
         >
           <View style={[styles.juridischIcon, { backgroundColor: colors.primary + "22" }]}>
-            <MaterialCommunityIcons name="help-circle" size={15} color={colors.primary} />
+            <Ionicons name="help-circle-outline" size={15} color={colors.primary} />
           </View>
           <Text style={[styles.juridischTekst, { color: colors.foreground }]}>Veelgestelde vragen & Support</Text>
-          <MaterialCommunityIcons name="chevron-right" size={16} color={colors.mutedForeground} />
+          <Ionicons name="chevron-forward-outline" size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -118,25 +118,25 @@ export default function TarievenScreen() {
           style={[styles.juridischRij, { borderBottomColor: colors.border, borderBottomWidth: 1 }]}
         >
           <View style={[styles.juridischIcon, { backgroundColor: colors.primary + "22" }]}>
-            <MaterialCommunityIcons name="shield-check" size={15} color={colors.primary} />
+            <Ionicons name="shield-checkmark-outline" size={15} color={colors.primary} />
           </View>
           <Text style={[styles.juridischTekst, { color: colors.foreground }]}>Privacybeleid</Text>
-          <MaterialCommunityIcons name="chevron-right" size={16} color={colors.mutedForeground} />
+          <Ionicons name="chevron-forward-outline" size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
 
         <View style={styles.juridischRij}>
           <View style={[styles.juridischIcon, { backgroundColor: colors.secondary }]}>
-            <MaterialCommunityIcons name="information" size={15} color={colors.mutedForeground} />
+            <Ionicons name="information-circle-outline" size={15} color={colors.mutedForeground} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.juridischTekst, { color: colors.foreground }]}>Versie 1.0.0</Text>
-            <Text style={[styles.versieNummer, { color: colors.mutedForeground }]}>Tarieven 2026 - Toygar Consultancy</Text>
+            <Text style={[styles.versieNummer, { color: colors.mutedForeground }]}>Tarieven 2026 - Aura Digital</Text>
           </View>
         </View>
       </View>
 
       <View style={[styles.disclaimerCard, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
-        <MaterialCommunityIcons name="alert-circle" size={14} color={colors.mutedForeground} />
+        <Ionicons name="alert-circle-outline" size={14} color={colors.mutedForeground} />
         <Text style={[styles.disclaimerTekst, { color: colors.mutedForeground }]}>
           Deze prijs is een indicatie op basis van wettelijke maximumtarieven en kan afwijken van de daadwerkelijke taxameter.
         </Text>

@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -69,7 +69,7 @@ export default function SupportScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.headerBar, { paddingTop: pt + 8, backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-          <MaterialCommunityIcons name="arrow-left" size={22} color={colors.primary} />
+          <Ionicons name="arrow-back-outline" size={22} color={colors.primary} />
         </TouchableOpacity>
         <Text style={[styles.headerTitel, { color: colors.foreground }]}>Support & FAQ</Text>
         <View style={{ width: 40 }} />
@@ -83,22 +83,21 @@ export default function SupportScreen() {
               <Text style={[styles.contactSub, { color: colors.foreground }]}>Ontwikkelaar van Taximeter Pro</Text>
             </View>
             <View style={[styles.contactIconWrap, { backgroundColor: colors.primary }]}>
-              <MaterialCommunityIcons name="lightning-bolt" size={20} color="#000" />
+              <Ionicons name="flash-outline" size={20} color="#000" />
             </View>
           </View>
           <TouchableOpacity onPress={stuurEmail} activeOpacity={0.8} style={[styles.emailKnop, { backgroundColor: colors.primary }]}>
-            <MaterialCommunityIcons name="email" size={16} color="#000" />
+            <Ionicons name="mail-outline" size={16} color="#000" />
             <Text style={styles.emailTekst}>info@auradigital.nl</Text>
           </TouchableOpacity>
           <Text style={[styles.contactInfo, { color: colors.mutedForeground }]}>Reactietijd: doorgaans binnen 1 werkdag</Text>
         </View>
 
         <View style={[styles.klantKaart, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <MaterialCommunityIcons name="briefcase" size={16} color={colors.mutedForeground} />
+          <Ionicons name="briefcase-outline" size={16} color={colors.mutedForeground} />
           <Text style={[styles.klantTekst, { color: colors.mutedForeground }]}>
             Taximeter Pro is een product van{" "}
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold" }}>Toygar Consultancy</Text>{" "}
-            en wordt technisch beheerd door Aura Digital.
+            <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold" }}>Aura Digital</Text>.
           </Text>
         </View>
 
@@ -113,7 +112,7 @@ export default function SupportScreen() {
                   <Text style={[styles.faqNummerTekst, { color: isOpen ? "#000" : colors.mutedForeground }]}>{idx + 1}</Text>
                 </View>
                 <Text style={[styles.faqVraag, { color: isOpen ? colors.primary : colors.foreground }]}>{item.vraag}</Text>
-                <MaterialCommunityIcons name={isOpen ? "chevron-up" : "chevron-down"} size={18} color={isOpen ? colors.primary : colors.mutedForeground} />
+                <Ionicons name={isOpen ? "chevron-up-outline" : "chevron-down-outline"} size={18} color={isOpen ? colors.primary : colors.mutedForeground} />
               </TouchableOpacity>
               {isOpen && <Text style={[styles.faqAntwoord, { color: colors.foreground }]}>{item.antwoord}</Text>}
             </View>
@@ -121,7 +120,7 @@ export default function SupportScreen() {
         })}
 
         <View style={[styles.footer, { backgroundColor: colors.secondary, borderColor: colors.border }]}>
-          <MaterialCommunityIcons name="alert-circle" size={13} color={colors.mutedForeground} />
+          <Ionicons name="alert-circle-outline" size={13} color={colors.mutedForeground} />
           <Text style={[styles.footerTekst, { color: colors.mutedForeground }]}>
             Deze prijs is een indicatie op basis van wettelijke maximumtarieven en kan afwijken van de daadwerkelijke taxameter.
           </Text>
