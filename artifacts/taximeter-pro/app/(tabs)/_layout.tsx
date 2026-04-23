@@ -1,34 +1,13 @@
-import { BlurView } from "expo-blur";
-import { isLiquidGlassAvailable } from "expo-glass-effect";
-import { Tabs } from "expo-router";
-import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
-import { SymbolView } from "expo-symbols";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { Tabs } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
 import { useColors } from "@/hooks/useColors";
 
-function NativeTabLayout() {
-  return (
-    <NativeTabs>
-      <NativeTabs.Trigger name="index">
-        <Icon sf={{ default: "car.fill", selected: "car.fill" }} />
-        <Label>Calculator</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="history">
-        <Icon sf={{ default: "clock", selected: "clock.fill" }} />
-        <Label>Ritten</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="settings">
-        <Icon sf={{ default: "slider.horizontal.3", selected: "slider.horizontal.3" }} />
-        <Label>Tarieven</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
-  );
-}
-
-function ClassicTabLayout() {
+export default function TabLayout() {
   const colors = useColors();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -51,9 +30,15 @@ function ClassicTabLayout() {
         },
         tabBarBackground: () =>
           isIOS ? (
-            <BlurView intensity={100} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
+            <BlurView
+              intensity={100}
+              tint={isDark ? "dark" : "light"}
+              style={StyleSheet.absoluteFill}
+            />
           ) : isWeb ? (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.card }]} />
+            <View
+              style={[StyleSheet.absoluteFill, { backgroundColor: colors.card }]}
+            />
           ) : null,
       }}
     >
@@ -61,11 +46,11 @@ function ClassicTabLayout() {
         name="index"
         options={{
           title: "Calculator",
-          tabBarIcon: ({ color }) =>
+          tabBarIcon: ({ color, size }) =>
             isIOS ? (
-              <SymbolView name="car.fill" tintColor={color} size={24} />
+              <SymbolView name="car.fill" tintColor={color} size={size} />
             ) : (
-              <Ionicons name="calculator-outline" size={24} color={color} />
+              <Ionicons name="calculator-outline" size={size} color={color} />
             ),
         }}
       />
@@ -73,11 +58,11 @@ function ClassicTabLayout() {
         name="history"
         options={{
           title: "Ritten",
-          tabBarIcon: ({ color }) =>
+          tabBarIcon: ({ color, size }) =>
             isIOS ? (
-              <SymbolView name="clock" tintColor={color} size={24} />
+              <SymbolView name="clock" tintColor={color} size={size} />
             ) : (
-              <Ionicons name="time-outline" size={24} color={color} />
+              <Ionicons name="time-outline" size={size} color={color} />
             ),
         }}
       />
@@ -85,21 +70,18 @@ function ClassicTabLayout() {
         name="settings"
         options={{
           title: "Tarieven",
-          tabBarIcon: ({ color }) =>
+          tabBarIcon: ({ color, size }) =>
             isIOS ? (
-              <SymbolView name="slider.horizontal.3" tintColor={color} size={24} />
+              <SymbolView
+                name="slider.horizontal.3"
+                tintColor={color}
+                size={size}
+              />
             ) : (
-              <Ionicons name="options-outline" size={24} color={color} />
+              <Ionicons name="options-outline" size={size} color={color} />
             ),
         }}
       />
     </Tabs>
   );
-}
-
-export default function TabLayout() {
-  if (isLiquidGlassAvailable()) {
-    return <NativeTabLayout />;
-  }
-  return <ClassicTabLayout />;
 }
