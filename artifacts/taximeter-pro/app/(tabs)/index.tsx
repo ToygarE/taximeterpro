@@ -119,8 +119,14 @@ export default function CalculatorScreen() {
       "Afstand: " + resultaat.afstandKm.toFixed(1) + " km  •  Reistijd: " + Math.round(resultaat.tijdMin) + " min\n" +
       "Voertuig: " + (resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
       "Geschatte ritprijs: " + prijs + "\n" +
-      "(Gebaseerd op wettelijke maximumtarieven)\n\n" +
-      "📍 Bekijk route:\n" + googleMapsUrl + "\n\n" +
+      "(Gebaseerd op wettelijke maximumtarieven)" +
+      (resultaat.extraKosten.length > 0
+        ? "\n\n🧾 Extra kosten:\n" +
+          resultaat.extraKosten
+            .map((ek) => ek.beschrijving + ": € " + ek.bedrag.toFixed(2).replace(".", ","))
+            .join("\n")
+        : "") +
+      "\n\n📍 Bekijk route:\n" + googleMapsUrl + "\n\n" +
       "Berekend via https://taximeterpro.nl";
 
     if (kaartUrl && Platform.OS === "ios" && FileSystem.cacheDirectory) {

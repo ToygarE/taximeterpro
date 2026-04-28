@@ -62,8 +62,14 @@ export default function GeschiedenisScreen() {
       "Afstand: " + item.afstandKm.toFixed(1) + " km  •  Reistijd: " + Math.round(item.tijdMin) + " min\n" +
       "Voertuig: " + (item.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
       "Geschatte ritprijs: " + prijs + "\n" +
-      "(Gebaseerd op wettelijke maximumtarieven)\n\n" +
-      "📍 Bekijk route:\n" + googleMapsUrl + "\n\n" +
+      "(Gebaseerd op wettelijke maximumtarieven)" +
+      (item.extraKosten.length > 0
+        ? "\n\n🧾 Extra kosten:\n" +
+          item.extraKosten
+            .map((ek) => ek.beschrijving + ": € " + ek.bedrag.toFixed(2).replace(".", ","))
+            .join("\n")
+        : "") +
+      "\n\n📍 Bekijk route:\n" + googleMapsUrl + "\n\n" +
       "Berekend via https://taximeterpro.nl";
     try { await Share.share({ message: tekst, title: "Taximeter Pro - Ritprijs" }); } catch {}
   };
