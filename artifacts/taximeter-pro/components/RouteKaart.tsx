@@ -8,6 +8,7 @@ interface Props {
   startLocatie: string;
   bestemming: string;
   hoogte?: number;
+  onMapUrl?: (url: string) => void;
 }
 
 interface Coordinate {
@@ -71,7 +72,7 @@ function bouwStaticMapUrl(
   );
 }
 
-export function RouteKaart({ startLocatie, bestemming, hoogte = 250 }: Props) {
+export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }: Props) {
   const colors = useColors();
   const [mapUrl, setMapUrl] = useState<string | null>(null);
   const [fout, setFout] = useState(false);
@@ -105,7 +106,7 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250 }: Props) {
           const leg = route.legs[0];
           start = { latitude: leg.start_location.lat, longitude: leg.start_location.lng };
           eind = { latitude: leg.end_location.lat, longitude: leg.end_location.lng };
-          encodedPolyline = route.overview_polyline.encoded;
+          encodedPolyline = route.overview_polyline.points;
         } else {
           [start, eind] = await Promise.all([geocode(startLocatie), geocode(bestemming)]);
         }
@@ -114,6 +115,7 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250 }: Props) {
 
         const url = bouwStaticMapUrl(start, eind, encodedPolyline, breedte, hoogte);
         setMapUrl(url);
+        onMapUrl?.(url);
       } catch {
         setFout(true);
       }

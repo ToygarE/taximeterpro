@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import {
@@ -43,6 +44,7 @@ export default function CalculatorScreen() {
   const [laden, setLaden] = useState(false);
   const [resultaat, setResultaat] = useState<RitResultaat | null>(null);
   const [internationaal, setInternationaal] = useState(false);
+  const [kaartUrl, setKaartUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOnline && modus === "api") setModus("handmatig");
@@ -70,6 +72,7 @@ export default function CalculatorScreen() {
         const routeData = await haalRouteData(startLocatie, bestemming);
         const rit = berekenRit({ voertuig, afstandKm: routeData.afstandKm, tijdMin: routeData.tijdMin, tarieven, extraKosten, startLocatie, bestemming });
         setResultaat(rit);
+        setKaartUrl(null);
         setHandmatigKm(routeData.afstandKm.toFixed(1));
         setHandmatigMin(String(Math.round(routeData.tijdMin)));
         addRit(rit);
@@ -92,6 +95,7 @@ export default function CalculatorScreen() {
       }
       const rit = berekenRit({ voertuig, afstandKm: km, tijdMin: min, tarieven, extraKosten, startLocatie: startLocatie || "Onbekend", bestemming: bestemming || "Onbekend" });
       setResultaat(rit);
+      setKaartUrl(null);
       addRit(rit);
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
@@ -100,21 +104,40 @@ export default function CalculatorScreen() {
   const deelResultaat = async () => {
     if (!resultaat) return;
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
     const prijs = "€ " + resultaat.totaalPrijs.toFixed(2).replace(".", ",");
+    const googleMapsUrl =
+      `https://www.google.com/maps/dir/?api=1` +
+      `&origin=${encodeURIComponent(resultaat.startLocatie)}` +
+      `&destination=${encodeURIComponent(resultaat.bestemming)}` +
+      `&travelmode=driving`;
+
     const tekst =
       "Taximeter Pro - Ritprijsberekening\n\n" +
       "Van: " + resultaat.startLocatie + "\n" +
       "Naar: " + resultaat.bestemming + "\n\n" +
       "Afstand: " + resultaat.afstandKm.toFixed(1) + " km | Reistijd: " + Math.round(resultaat.tijdMin) + " min\n" +
       "Voertuig: " + (resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
-      "Uw geschatte ritprijs via Taximeter Pro bedraagt: " + prijs + "\n\n" +
+      "Geschatte ritprijs: " + prijs + "\n\n" +
+      "Bekijk route: " + googleMapsUrl + "\n\n" +
       "(Gebaseerd op wettelijke maximumtarieven 2026. Definitieve prijs volgens taxameter.)";
+
+    if (kaartUrl && Platform.OS === "ios" && FileSystem.cacheDirectory) {
+      try {
+        const fileUri = FileSystem.cacheDirectory + "taximeter-route.png";
+        await FileSystem.downloadAsync(kaartUrl, fileUri);
+        await Share.share({ message: tekst, url: fileUri });
+        return;
+      } catch {}
+    }
+
     try { await Share.share({ message: tekst, title: "Taximeter Pro - Ritprijs" }); } catch {}
   };
 
   const reset = () => {
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setResultaat(null);
+    setKaartUrl(null);
     setStartLocatie("");
     setBestemming("");
     setHandmatigKm("0");
@@ -261,7 +284,12 @@ export default function CalculatorScreen() {
             </View>
 
             {/* Routekaart */}
-            <RouteKaart startLocatie={resultaat.startLocatie} bestemming={resultaat.bestemming} hoogte={250} />
+            <RouteKaart
+              startLocatie={resultaat.startLocatie}
+              bestemming={resultaat.bestemming}
+              hoogte={250}
+              onMapUrl={(url) => setKaartUrl(url)}
+            />
 
             <View style={[styles.routeInfo, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <View style={styles.routeRegel}>
