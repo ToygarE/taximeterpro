@@ -15,33 +15,30 @@ import { useColors } from "@/hooks/useColors";
 
 const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
 
-const DEMO_ADRESSEN = [
-  "Damrak 1, 1012 LG Amsterdam",
-  "Aurorastraat 49, 1363 ZH Almere",
-  "Aurorastraat 12, 1363 ZH Almere",
-  "Aurorastraat 5, 1363 ZG Almere",
-  "Binnenhof 1, 2513 AA Den Haag",
-  "Coolsingel 40, 3011 AD Rotterdam",
-  "Oudegracht 229, 3511 NK Utrecht",
-  "Markt 1, 5611 EC Eindhoven",
-  "Grote Markt 1, 9712 HN Groningen",
-  "Vrijthof 47, 6211 LE Maastricht",
-  "Schiphol Plaza, 1118 BG Schiphol",
-  "Stationsplein 1, 1012 AB Amsterdam Centraal",
-  "Stationsplein 14, 3013 AK Rotterdam Centraal",
-  "Luchthavenlaan 1, 1930 Zaventem, Brussel",
-  "Grote Markt 1, 2000 Antwerpen",
-  "Domplatz 1, 50667 Keulen",
-  "Königsallee 1, 40212 Düsseldorf",
-  "Keizersgracht 100, 1015 CK Amsterdam",
-  "Herengracht 200, 1016 BS Amsterdam",
-  "Blaak 40, 3011 TA Rotterdam",
-  "Lange Poten 50, 2511 CK Den Haag",
+const DEMO_SUGGESTIES: Suggestie[] = [
+  { place_id: "demo-0", description: "Damrak 1, 1012 LG Amsterdam", mainText: "Damrak 1", secondaryText: "Amsterdam", isPoi: false },
+  { place_id: "demo-1", description: "Hotel Krasnapolsky, Dam 9, Amsterdam", mainText: "Hotel Krasnapolsky", secondaryText: "Dam 9, Amsterdam", isPoi: true },
+  { place_id: "demo-2", description: "Johan Cruijff Arena, Amsterdam Zuidoost", mainText: "Johan Cruijff Arena", secondaryText: "Amsterdam Zuidoost", isPoi: true },
+  { place_id: "demo-3", description: "Amsterdam Airport Schiphol, 1118 CP Schiphol", mainText: "Amsterdam Airport Schiphol", secondaryText: "Schiphol", isPoi: true },
+  { place_id: "demo-4", description: "Binnenhof 1, 2513 AA Den Haag", mainText: "Binnenhof 1", secondaryText: "Den Haag", isPoi: false },
+  { place_id: "demo-5", description: "Coolsingel 40, 3011 AD Rotterdam", mainText: "Coolsingel 40", secondaryText: "Rotterdam", isPoi: false },
+  { place_id: "demo-6", description: "Rotterdam Centraal, Stationsplein, Rotterdam", mainText: "Rotterdam Centraal", secondaryText: "Stationsplein, Rotterdam", isPoi: true },
+  { place_id: "demo-7", description: "Markthal Rotterdam, Dominee Jan Scharpstraat 298, Rotterdam", mainText: "Markthal Rotterdam", secondaryText: "Rotterdam", isPoi: true },
+  { place_id: "demo-8", description: "Oudegracht 229, 3511 NK Utrecht", mainText: "Oudegracht 229", secondaryText: "Utrecht", isPoi: false },
+  { place_id: "demo-9", description: "Rijksmuseum, Museumstraat 1, Amsterdam", mainText: "Rijksmuseum", secondaryText: "Museumstraat 1, Amsterdam", isPoi: true },
+  { place_id: "demo-10", description: "De Bijenkorf, Dam 1, Amsterdam", mainText: "De Bijenkorf", secondaryText: "Dam 1, Amsterdam", isPoi: true },
+  { place_id: "demo-11", description: "Keizersgracht 100, 1015 CK Amsterdam", mainText: "Keizersgracht 100", secondaryText: "Amsterdam", isPoi: false },
+  { place_id: "demo-12", description: "Vrijthof 47, 6211 LE Maastricht", mainText: "Vrijthof 47", secondaryText: "Maastricht", isPoi: false },
+  { place_id: "demo-13", description: "Grote Markt 1, 9712 HN Groningen", mainText: "Grote Markt 1", secondaryText: "Groningen", isPoi: false },
+  { place_id: "demo-14", description: "Eindhoven Airport, Luchthavenweg 25, Eindhoven", mainText: "Eindhoven Airport", secondaryText: "Luchthavenweg, Eindhoven", isPoi: true },
 ];
 
 interface Suggestie {
   place_id: string;
   description: string;
+  mainText: string;
+  secondaryText: string;
+  isPoi: boolean;
 }
 
 interface Props {
@@ -54,9 +51,11 @@ interface Props {
 
 function demoSuggesties(tekst: string): Suggestie[] {
   const q = tekst.toLowerCase();
-  return DEMO_ADRESSEN.filter((p) => p.toLowerCase().includes(q))
-    .slice(0, 6)
-    .map((p, i) => ({ place_id: `demo-${i}-${p}`, description: p }));
+  return DEMO_SUGGESTIES.filter(
+    (s) =>
+      s.description.toLowerCase().includes(q) ||
+      s.mainText.toLowerCase().includes(q)
+  ).slice(0, 6);
 }
 
 export function LocatieInput({
@@ -99,7 +98,6 @@ export function LocatieInput({
             const url =
               `https://maps.googleapis.com/maps/api/place/autocomplete/json` +
               `?input=${encodeURIComponent(query)}` +
-              `&types=address` +
               `&components=country:nl|country:be|country:de` +
               `&language=nl` +
               `&key=${GOOGLE_API_KEY}`;
@@ -110,9 +108,26 @@ export function LocatieInput({
               setSuggesties(
                 data.predictions
                   .slice(0, 6)
-                  .map((p: { place_id: string; description: string }) => ({
+                  .map((p: {
+                    place_id: string;
+                    description: string;
+                    types?: string[];
+                    structured_formatting?: {
+                      main_text?: string;
+                      secondary_text?: string;
+                    };
+                  }) => ({
                     place_id: p.place_id,
                     description: p.description,
+                    mainText: p.structured_formatting?.main_text ?? p.description,
+                    secondaryText: p.structured_formatting?.secondary_text ?? "",
+                    isPoi: !!(p.types && (
+                      p.types.includes("establishment") ||
+                      p.types.includes("point_of_interest") ||
+                      p.types.includes("lodging") ||
+                      p.types.includes("stadium") ||
+                      p.types.includes("airport")
+                    )),
                   }))
               );
             } else {
@@ -140,14 +155,37 @@ export function LocatieInput({
     [onVerander]
   );
 
-  const kiesSuggestie = (s: Suggestie) => {
+  const kiesSuggestie = async (s: Suggestie) => {
     isSelectingRef.current = true;
     if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
     onVerander(s.description);
+    latestQueryRef.current = s.description;
     setSuggesties([]);
     setGefocust(false);
-    latestQueryRef.current = s.description;
-    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+    if (GOOGLE_API_KEY && !s.place_id.startsWith("demo-")) {
+      setLoadingApi(true);
+      try {
+        const detailsUrl =
+          `https://maps.googleapis.com/maps/api/place/details/json` +
+          `?place_id=${encodeURIComponent(s.place_id)}` +
+          `&fields=formatted_address,geometry` +
+          `&language=nl` +
+          `&key=${GOOGLE_API_KEY}`;
+        const res = await fetch(detailsUrl);
+        const data = await res.json();
+        if (data.result?.formatted_address) {
+          onVerander(data.result.formatted_address);
+          latestQueryRef.current = data.result.formatted_address;
+        }
+      } catch {}
+      finally {
+        setLoadingApi(false);
+      }
+    }
+
     setTimeout(() => {
       isSelectingRef.current = false;
     }, 100);
@@ -250,7 +288,7 @@ export function LocatieInput({
             onFocus={handleFocus}
             onBlur={handleBlur}
             style={[styles.input, { color: colors.foreground }]}
-            placeholder="Typ een adres of straatnaam..."
+            placeholder="Adres, hotel, bedrijf of locatie..."
             placeholderTextColor={colors.mutedForeground}
             autoCorrect={false}
             autoCapitalize="words"
@@ -332,14 +370,28 @@ export function LocatieInput({
                 ]}
               >
                 <View style={[styles.suggestieIcon, { backgroundColor: colors.primary + "22" }]}>
-                  <Ionicons name="location-outline" size={13} color={colors.primary} />
+                  <Ionicons
+                    name={item.isPoi ? "business-outline" : "location-outline"}
+                    size={13}
+                    color={colors.primary}
+                  />
                 </View>
-                <Text
-                  style={[styles.suggestieTekst, { color: colors.foreground }]}
-                  numberOfLines={2}
-                >
-                  {item.description}
-                </Text>
+                <View style={styles.suggestieTekstWrapper}>
+                  <Text
+                    style={[styles.suggestieHoofd, { color: colors.foreground }]}
+                    numberOfLines={1}
+                  >
+                    {item.mainText}
+                  </Text>
+                  {item.secondaryText ? (
+                    <Text
+                      style={[styles.suggestieSub, { color: colors.mutedForeground }]}
+                      numberOfLines={1}
+                    >
+                      {item.secondaryText}
+                    </Text>
+                  ) : null}
+                </View>
                 <Ionicons name="return-up-back-outline" size={13} color={colors.mutedForeground} />
               </TouchableOpacity>
             )}
@@ -348,7 +400,7 @@ export function LocatieInput({
             <View style={[styles.demoRij, { borderTopColor: colors.border }]}>
               <Ionicons name="information-circle-outline" size={11} color={colors.mutedForeground} />
               <Text style={[styles.demoTekst, { color: colors.mutedForeground }]}>
-                Demo-modus - voeg Google Maps API-sleutel toe
+                Demo-modus — voeg Google Maps API-sleutel toe
               </Text>
             </View>
           )}
@@ -378,10 +430,12 @@ const styles = StyleSheet.create({
   },
   suggestieRij: {
     flexDirection: "row", alignItems: "center", gap: 10,
-    paddingHorizontal: 14, paddingVertical: 13,
+    paddingHorizontal: 14, paddingVertical: 11,
   },
-  suggestieIcon: { width: 26, height: 26, borderRadius: 7, alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  suggestieTekst: { fontSize: 13, fontFamily: "Inter_400Regular", flex: 1 },
+  suggestieIcon: { width: 28, height: 28, borderRadius: 8, alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  suggestieTekstWrapper: { flex: 1, gap: 1 },
+  suggestieHoofd: { fontSize: 14, fontFamily: "Inter_500Medium" },
+  suggestieSub: { fontSize: 12, fontFamily: "Inter_400Regular" },
   demoRij: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderTopWidth: 1 },
   demoTekst: { fontSize: 11, fontFamily: "Inter_400Regular", flex: 1 },
 });
