@@ -119,7 +119,7 @@ export default function CalculatorScreen() {
       "Afstand: " + resultaat.afstandKm.toFixed(1) + " km  •  Reistijd: " + Math.round(resultaat.tijdMin) + " min\n" +
       "Voertuig: " + (resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
       "Geschatte ritprijs: " + prijs + "\n" +
-      "(Gebaseerd op wettelijke maximumtarieven 2026)\n\n" +
+      "(Gebaseerd op wettelijke maximumtarieven)\n\n" +
       "📍 Bekijk route:\n" + googleMapsUrl + "\n\n" +
       "Berekend via https://taximeterpro.nl";
 

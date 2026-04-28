@@ -50,14 +50,21 @@ export default function GeschiedenisScreen() {
   const deelRit = async (item: RitResultaat) => {
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const prijs = "€ " + item.totaalPrijs.toFixed(2).replace(".", ",");
+    const googleMapsUrl =
+      `https://www.google.com/maps/dir/?api=1` +
+      `&origin=${encodeURIComponent(item.startLocatie)}` +
+      `&destination=${encodeURIComponent(item.bestemming)}` +
+      `&travelmode=driving`;
     const tekst =
-      "Taximeter Pro - Ritprijsberekening\n\n" +
+      "🚕 Taximeter Pro — Ritprijsberekening\n\n" +
       "Van: " + item.startLocatie + "\n" +
       "Naar: " + item.bestemming + "\n\n" +
-      "Afstand: " + item.afstandKm.toFixed(1) + " km | Reistijd: " + Math.round(item.tijdMin) + " min\n" +
+      "Afstand: " + item.afstandKm.toFixed(1) + " km  •  Reistijd: " + Math.round(item.tijdMin) + " min\n" +
       "Voertuig: " + (item.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
-      "Uw geschatte ritprijs via Taximeter Pro bedraagt: " + prijs + "\n\n" +
-      "(Gebaseerd op wettelijke maximumtarieven 2026.)";
+      "Geschatte ritprijs: " + prijs + "\n" +
+      "(Gebaseerd op wettelijke maximumtarieven)\n\n" +
+      "📍 Bekijk route:\n" + googleMapsUrl + "\n\n" +
+      "Berekend via https://taximeterpro.nl";
     try { await Share.share({ message: tekst, title: "Taximeter Pro - Ritprijs" }); } catch {}
   };
 
