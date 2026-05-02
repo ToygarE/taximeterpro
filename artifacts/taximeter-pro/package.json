@@ -1,5 +1,5 @@
 {
-  "name": "taximeter-pro",
+  "name": "@workspace/taximeter-pro",
   "version": "0.0.0",
   "private": true,
   "scripts": {
