@@ -42,7 +42,7 @@ export default function RootLayout() {
     Inter_700Bold,
     ...(Platform.OS === "web"
       ? { ionicons: "https://unpkg.com/@expo/vector-icons@15.0.3/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf" }
-      : { ionicons: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf") }),
+      : { ionicons: require("../assets/fonts/Ionicons.ttf") }),
   });
 
   useEffect(() => {

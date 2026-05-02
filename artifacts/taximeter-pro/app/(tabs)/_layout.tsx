@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 
@@ -46,40 +45,27 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Calculator",
-          tabBarIcon: ({ color, size }) =>
-            isIOS ? (
-              <SymbolView name="car.fill" tintColor={color} size={size} />
-            ) : (
-              <Ionicons name="calculator-outline" size={size} color={color} />
-            ),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calculator-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="history"
         options={{
           title: "Ritten",
-          tabBarIcon: ({ color, size }) =>
-            isIOS ? (
-              <SymbolView name="clock" tintColor={color} size={size} />
-            ) : (
-              <Ionicons name="time-outline" size={size} color={color} />
-            ),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="time-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: "Tarieven",
-          tabBarIcon: ({ color, size }) =>
-            isIOS ? (
-              <SymbolView
-                name="slider.horizontal.3"
-                tintColor={color}
-                size={size}
-              />
-            ) : (
-              <Ionicons name="options-outline" size={size} color={color} />
-            ),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="options-outline" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>

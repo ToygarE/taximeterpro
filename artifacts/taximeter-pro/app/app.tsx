@@ -216,10 +216,10 @@ export default function AppScreen() {
         ) : (
           <View style={{ gap: 10 }}>
             <View style={{ zIndex: 20 }}>
-              <LocatieInput label="Van (optioneel)" waarde={startLocatie} onVerander={setStartLocatie} icoon="map-marker" toonLocatieKnop />
+              <LocatieInput label="Van (optioneel)" waarde={startLocatie} onVerander={setStartLocatie} icoon="location-outline" toonLocatieKnop />
             </View>
             <View style={{ zIndex: 10 }}>
-              <LocatieInput label="Naar (optioneel)" waarde={bestemming} onVerander={setBestemming} icoon="flag" />
+              <LocatieInput label="Naar (optioneel)" waarde={bestemming} onVerander={setBestemming} icoon="flag-outline" />
             </View>
             <HandmatigInput kmWaarde={handmatigKm} onKmVerander={setHandmatigKm} minWaarde={handmatigMin} onMinVerander={setHandmatigMin} />
           </View>
