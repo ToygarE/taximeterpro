@@ -36,16 +36,14 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
-  const ioniconsSource = Platform.OS === "web"
-    ? "https://unpkg.com/@expo/vector-icons@15.0.3/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf"
-    : (Ionicons.font as Record<string, unknown>)["Ionicons"];
-
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
-    Ionicons: ioniconsSource as string,
+    ...(Platform.OS === "web"
+      ? { ionicons: "https://unpkg.com/@expo/vector-icons@15.0.3/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf" }
+      : Ionicons.font),
   });
 
   useEffect(() => {
