@@ -25,6 +25,7 @@
       "config": {
         "googleMapsApiKey": "AIzaSyDbIIcl65uaApHjPd1zslTYfVCAuWnIDCM"
       },
+
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit.",
