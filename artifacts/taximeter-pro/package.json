@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "EXPO_PACKAGER_PROXY_URL=https://$REPLIT_EXPO_DEV_DOMAIN EXPO_PUBLIC_DOMAIN=$REPLIT_DEV_DOMAIN EXPO_PUBLIC_REPL_ID=$REPL_ID REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN pnpm exec expo start --localhost --port $PORT",
+    "dev": "printf 'EXPO_PUBLIC_GOOGLE_MAPS_KEY=%s\\nEXPO_PUBLIC_DOMAIN=%s\\nEXPO_PUBLIC_REPL_ID=%s\\n' \"$EXPO_PUBLIC_GOOGLE_MAPS_KEY\" \"$REPLIT_DEV_DOMAIN\" \"$REPL_ID\" > .env.local && env -u EXPO_PUBLIC_GOOGLE_MAPS_KEY -u EXPO_PUBLIC_DOMAIN -u EXPO_PUBLIC_REPL_ID EXPO_PACKAGER_PROXY_URL=https://$REPLIT_EXPO_DEV_DOMAIN REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN pnpm exec expo start --localhost --port $PORT",
     "build": "node scripts/build.js",
     "build:web": "expo export --platform web",
     "serve": "node server/serve.js",
