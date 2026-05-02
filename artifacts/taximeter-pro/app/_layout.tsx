@@ -5,11 +5,11 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import { Ionicons } from "@expo/vector-icons";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -20,6 +20,9 @@ import { TaximeterProvider } from "@/context/TaximeterContext";
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
+
+const IONICONS_CDN =
+  "https://cdn.jsdelivr.net/npm/@expo/vector-icons@15.1.1/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf";
 
 function RootLayoutNav() {
   return (
@@ -40,13 +43,20 @@ export default function RootLayout() {
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
-    ...Ionicons.font,
+    ...(Platform.OS !== "web" ? { ionicons: IONICONS_CDN } : {}),
   });
 
   useEffect(() => {
     if (__DEV__) {
       const { isLoaded } = require("expo-font");
-      console.log("[Layout] fontsLoaded:", fontsLoaded, "fontError:", fontError?.message ?? null, "ionicons registered:", isLoaded("ionicons"));
+      console.log(
+        "[Layout] fontsLoaded:",
+        fontsLoaded,
+        "fontError:",
+        fontError?.message ?? null,
+        "ionicons registered:",
+        isLoaded("ionicons"),
+      );
     }
   }, [fontsLoaded, fontError]);
 

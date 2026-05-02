@@ -11,3 +11,9 @@ id = "4aY64aTzJNZJ221qPWrb1"
 uri = "file://screenshots/route_polyline.png"
 type = "image"
 title = "Kaartweergave met gele polylijn — servertest geslaagd"
+
+[[outputs]]
+id = "qTTFsde5qJ-ZOUU49FQ3N"
+uri = "file://screenshots/route_ios.png"
+type = "image"
+title = "iOS route: Schiphol → Amsterdam Dam — gele polylijn servertest"
