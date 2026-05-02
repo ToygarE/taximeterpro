@@ -46,10 +46,10 @@ export function PrijsDisplay({
 
       <View style={styles.regel}>
         <Text style={[styles.label, { color: colors.foreground }]}>
-          {afstandKm.toFixed(1)} km × {formatEuro(kmTarief)}
+          {(Math.round(afstandKm * 10) / 10).toFixed(1)} km × {formatEuro(kmTarief)}
         </Text>
         <Text style={[styles.waarde, { color: colors.foreground }]}>
-          {formatEuro(afstandKm * kmTarief)}
+          {formatEuro((Math.round(afstandKm * 10) / 10) * kmTarief)}
         </Text>
       </View>
 
@@ -58,7 +58,7 @@ export function PrijsDisplay({
           {Math.round(tijdMin)} min × {formatEuro(minTarief)}
         </Text>
         <Text style={[styles.waarde, { color: colors.foreground }]}>
-          {formatEuro(tijdMin * minTarief)}
+          {formatEuro(Math.round(tijdMin) * minTarief)}
         </Text>
       </View>
 
@@ -85,7 +85,7 @@ export function PrijsDisplay({
       </View>
 
       <Text style={[styles.formule, { color: colors.mutedForeground }]}>
-        {formatEuro(startTarief)} + ({afstandKm.toFixed(1)} × {formatEuro(kmTarief)}) + ({Math.round(tijdMin)} × {formatEuro(minTarief)}){extraTotaal > 0 ? ` + ${formatEuro(extraTotaal)}` : ""} = {formatEuro(totaalPrijs)}
+        {formatEuro(startTarief)} + ({(Math.round(afstandKm * 10) / 10).toFixed(1)} × {formatEuro(kmTarief)}) + ({Math.round(tijdMin)} × {formatEuro(minTarief)}){extraTotaal > 0 ? ` + ${formatEuro(extraTotaal)}` : ""} = {formatEuro(totaalPrijs)}
       </Text>
     </View>
   );

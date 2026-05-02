@@ -1,0 +1,46 @@
+In de geschiedenis van onze interactie hebben we de "kruisjes"-issue bij de iconen opgelost door een conflict in de lettertypes (font-family) te omzeilen. In de browser op Android (en op het web) werd het standaard lettertype ('Inter') soms over de iconen heen geforceerd, waardoor de browser letters probeerde te tonen in plaats van de icoon-symbolen.
+
+De oplossing die toen werkte en die je nu opnieuw moet toepassen, bestaat uit drie stappen:
+
+1. De CSS-fix in index.html
+We hebben een specifiek <style> blok toegevoegd aan de <head> van je index.html. Dit blok dwingt de icoon-classes (.fa, .material-icons, etc.) om hun eigen font te gebruiken met de !important regel, zodat 'Inter' dit niet kan overschrijven.
+
+De code die we toen gebruikten:
+
+HTML
+<style id="expo-reset">
+  /* 1. Basis tekst naar Inter */
+  html, body, #root {
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* 2. De SPECIFIEKE FIX voor icoontjes */
+  .fa, .fas, .far, .fab, [class^="fa-"], [class*=" fa-"], .material-icons {
+    font-family: "Font Awesome 6 Free", "Material Icons" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    display: inline-block !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+  }
+</style>
+2. CDN Links toevoegen
+De iconen werkten niet omdat de lokale bestanden niet goed gedecodeerd konden worden. We hebben dit opgelost door de iconen direct via een betrouwbare externe bron (CDN) in te laden in de <head> van je index.html:
+
+Font Awesome: <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+Material Icons: <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+Ionicons: De scripts onderaan voor ionicons.esm.js.
+
+3. De juiste bestandslocatie in Expo
+De allerbelangrijkste stap die we toen hebben vastgesteld: deze index.html moet in de map /public/index.html staan.
+
+Tijdens het commando npx expo export --platform web kijkt Expo in de public map.
+
+Als daar een index.html staat, gebruikt hij die als "template" voor je hele website en de web-versie in Android.
+
+Zonder dit bestand op de juiste plek, genereert Expo een standaard HTML-bestand zonder jouw CSS-fixes, en zie je weer kruisjes.
+
+Kortom: De fix was het overschrijven van de font-priority door middel van een handmatige index.html in de /public map. Omdat je aangeeft dat de iconen nu weer kruisjes zijn, is de kans groot dat bij je laatste build de dist map is gegenereerd zonder dat jouw aangepaste public/index.html is meegekomen.

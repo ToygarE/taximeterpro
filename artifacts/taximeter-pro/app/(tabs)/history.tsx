@@ -165,15 +165,15 @@ export default function GeschiedenisScreen() {
               </View>
               <View style={styles.prijsRegel}>
                 <Text style={[styles.prijsLabel, { color: colors.foreground }]}>
-                  {item.afstandKm.toFixed(1)} km x {formatEuro(item.kmTarief)}
+                  {(Math.round(item.afstandKm * 10) / 10).toFixed(1)} km x {formatEuro(item.kmTarief)}
                 </Text>
-                <Text style={[styles.prijsWaarde, { color: colors.foreground }]}>{formatEuro(item.afstandKm * item.kmTarief)}</Text>
+                <Text style={[styles.prijsWaarde, { color: colors.foreground }]}>{formatEuro((Math.round(item.afstandKm * 10) / 10) * item.kmTarief)}</Text>
               </View>
               <View style={styles.prijsRegel}>
                 <Text style={[styles.prijsLabel, { color: colors.foreground }]}>
                   {Math.round(item.tijdMin)} min x {formatEuro(item.minTarief)}
                 </Text>
-                <Text style={[styles.prijsWaarde, { color: colors.foreground }]}>{formatEuro(item.tijdMin * item.minTarief)}</Text>
+                <Text style={[styles.prijsWaarde, { color: colors.foreground }]}>{formatEuro(Math.round(item.tijdMin) * item.minTarief)}</Text>
               </View>
               {item.extraKosten.map((ek, idx) => (
                 <View style={styles.prijsRegel} key={idx}>

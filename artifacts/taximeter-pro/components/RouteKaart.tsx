@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
 const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
@@ -57,7 +57,7 @@ function bouwStaticMapUrl(
 
   const path = encodedPolyline
     ? `path=color:0xFFD700FF|weight:4|enc:${encodeURIComponent(encodedPolyline)}`
-    : `path=color:0xFFD700FF|weight:3|${start.latitude},${start.longitude}|${eind.latitude},${eind.longitude}`;
+    : `path=color:0xFFD700FF|weight:5|geodesic:true|${start.latitude},${start.longitude}|${eind.latitude},${eind.longitude}`;
 
   return (
     `https://maps.googleapis.com/maps/api/staticmap` +
@@ -162,9 +162,15 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
       onLayout={(e) => setBreedte(e.nativeEvent.layout.width)}
     >
       <Image
-        source={{ uri: mapUrl }}
+        key={mapUrl}
+        source={
+          Platform.OS === "ios"
+            ? { uri: mapUrl, cache: "reload" }
+            : { uri: mapUrl }
+        }
         style={StyleSheet.absoluteFillObject}
         resizeMode="cover"
+        onError={() => setFout(true)}
       />
     </View>
   );

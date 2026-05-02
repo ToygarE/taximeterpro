@@ -63,8 +63,11 @@ export function berekenRit(params: BerekenParams): RitResultaat {
   const kmTarief = voertuig === "auto" ? tarieven.autoKm : tarieven.busKm;
   const minTarief = voertuig === "auto" ? tarieven.autoMin : tarieven.busMin;
 
-  const kmKosten = afstandKm * kmTarief;
-  const minKosten = tijdMin * minTarief;
+  const afstandKmAfgerond = Math.round(afstandKm * 10) / 10;
+  const tijdMinAfgerond = Math.round(tijdMin);
+
+  const kmKosten = afstandKmAfgerond * kmTarief;
+  const minKosten = tijdMinAfgerond * minTarief;
   const extraTotaal = extraKosten.reduce((sum, ek) => sum + ek.bedrag, 0);
 
   const totaalPrijs = startTarief + kmKosten + minKosten + extraTotaal;
@@ -72,8 +75,8 @@ export function berekenRit(params: BerekenParams): RitResultaat {
   return {
     id: genId(),
     voertuig,
-    afstandKm,
-    tijdMin,
+    afstandKm: afstandKmAfgerond,
+    tijdMin: tijdMinAfgerond,
     startTarief,
     kmTarief,
     minTarief,
