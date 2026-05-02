@@ -98,8 +98,12 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
           `&destination=${encodeURIComponent(bestemming)}` +
           `&language=nl&key=${GOOGLE_API_KEY}`;
 
+        console.log("[RouteKaart] key aanwezig:", !!GOOGLE_API_KEY, "| van:", startLocatie.substring(0, 20), "naar:", bestemming.substring(0, 20));
+
         const res = await fetch(dirUrl);
         const data = await res.json();
+
+        console.log("[RouteKaart] Directions status:", data.status, "| routes:", data.routes?.length ?? 0);
 
         if (data.status === "OK" && data.routes?.[0]) {
           const route = data.routes[0];
@@ -107,16 +111,20 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
           start = { latitude: leg.start_location.lat, longitude: leg.start_location.lng };
           eind = { latitude: leg.end_location.lat, longitude: leg.end_location.lng };
           encodedPolyline = route.overview_polyline.points;
+          console.log("[RouteKaart] Polyline ontvangen, lengte:", encodedPolyline.length);
         } else {
+          console.warn("[RouteKaart] Directions mislukt (status:", data.status, ") – geocoding fallback");
           [start, eind] = await Promise.all([geocode(startLocatie), geocode(bestemming)]);
         }
 
         if (!start || !eind) { setFout(true); return; }
 
         const url = bouwStaticMapUrl(start, eind, encodedPolyline, breedte, hoogte);
+        console.log("[RouteKaart] Kaart-URL lengte:", url.length, "| polyline:", encodedPolyline ? "ja" : "nee (rechte lijn)");
         setMapUrl(url);
         onMapUrl?.(url);
-      } catch {
+      } catch (err) {
+        console.error("[RouteKaart] Fout:", err);
         setFout(true);
       }
     })();
