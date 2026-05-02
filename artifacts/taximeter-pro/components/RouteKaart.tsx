@@ -1,6 +1,8 @@
+import * as FileSystem from "expo-file-system";
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { MAPS_FETCH_OPTS } from "@/utils/berekeningen";
 
 const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
 
@@ -20,7 +22,7 @@ async function geocode(adres: string): Promise<Coordinate | null> {
   if (!GOOGLE_API_KEY) return null;
   try {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(adres)}&language=nl&key=${GOOGLE_API_KEY}`;
-    const res = await fetch(url);
+    const res = await fetch(url, MAPS_FETCH_OPTS);
     const data = await res.json();
     if (data.results?.[0]) {
       const loc = data.results[0].geometry.location;
@@ -74,7 +76,7 @@ function bouwStaticMapUrl(
 
 export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }: Props) {
   const colors = useColors();
-  const [mapUrl, setMapUrl] = useState<string | null>(null);
+  const [displayUri, setDisplayUri] = useState<string | null>(null);
   const [fout, setFout] = useState(false);
   const [breedte, setBreedte] = useState(350);
 
@@ -84,7 +86,7 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
       return;
     }
     setFout(false);
-    setMapUrl(null);
+    setDisplayUri(null);
 
     (async () => {
       try {
@@ -98,7 +100,7 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
           `&destination=${encodeURIComponent(bestemming)}` +
           `&language=nl&key=${GOOGLE_API_KEY}`;
 
-        const res = await fetch(dirUrl);
+        const res = await fetch(dirUrl, MAPS_FETCH_OPTS);
         const data = await res.json();
 
         if (data.status === "OK" && data.routes?.[0]) {
@@ -113,9 +115,22 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
 
         if (!start || !eind) { setFout(true); return; }
 
-        const url = bouwStaticMapUrl(start, eind, encodedPolyline, breedte, hoogte);
-        setMapUrl(url);
-        onMapUrl?.(url);
+        const mapUrl = bouwStaticMapUrl(start, eind, encodedPolyline, breedte, hoogte);
+        onMapUrl?.(mapUrl);
+
+        if (Platform.OS !== "web" && FileSystem.cacheDirectory) {
+          const localPath = FileSystem.cacheDirectory + "taximeter-map.png";
+          const result = await FileSystem.downloadAsync(mapUrl, localPath, {
+            headers: { Referer: "https://taximeterpro.nl", Origin: "https://taximeterpro.nl" },
+          });
+          if (result.status === 200) {
+            setDisplayUri(result.uri);
+          } else {
+            setDisplayUri(mapUrl);
+          }
+        } else {
+          setDisplayUri(mapUrl);
+        }
       } catch {
         setFout(true);
       }
@@ -141,7 +156,7 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
     );
   }
 
-  if (!mapUrl) {
+  if (!displayUri) {
     return (
       <View
         style={[
@@ -162,7 +177,7 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
       onLayout={(e) => setBreedte(e.nativeEvent.layout.width)}
     >
       <Image
-        source={{ uri: mapUrl }}
+        source={{ uri: displayUri }}
         style={StyleSheet.absoluteFillObject}
         resizeMode="cover"
       />

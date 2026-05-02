@@ -1,6 +1,11 @@
+import { Platform } from "react-native";
 import type { ExtraKosten, RitResultaat, TarifSettings } from "@/context/TaximeterContext";
 
 const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
+
+export const MAPS_FETCH_OPTS: RequestInit = Platform.OS !== "web"
+  ? { headers: { Referer: "https://taximeterpro.nl", Origin: "https://taximeterpro.nl" } }
+  : {};
 
 interface RouteData {
   afstandKm: number;
@@ -19,10 +24,14 @@ export async function haalRouteData(
     origin
   )}&destinations=${encodeURIComponent(destination)}&language=nl&key=${GOOGLE_API_KEY}`;
 
-  const res = await fetch(url);
+  const res = await fetch(url, MAPS_FETCH_OPTS);
   if (!res.ok) throw new Error("API verzoek mislukt");
 
   const data = await res.json();
+
+  if (data.status === "REQUEST_DENIED") {
+    throw new Error(`API sleutel heeft geen toegang: ${data.error_message ?? "REQUEST_DENIED"}`);
+  }
 
   if (
     data.status !== "OK" ||

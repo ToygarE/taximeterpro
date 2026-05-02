@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { MAPS_FETCH_OPTS } from "@/utils/berekeningen";
 
 const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
 
@@ -101,7 +102,7 @@ export function LocatieInput({
               `&components=country:nl|country:be|country:de` +
               `&language=nl` +
               `&key=${GOOGLE_API_KEY}`;
-            const res = await fetch(url);
+            const res = await fetch(url, MAPS_FETCH_OPTS);
             const data = await res.json();
             if (latestQueryRef.current !== query) return;
             if (data.predictions && data.predictions.length > 0) {
@@ -174,7 +175,7 @@ export function LocatieInput({
           `&fields=formatted_address,geometry` +
           `&language=nl` +
           `&key=${GOOGLE_API_KEY}`;
-        const res = await fetch(detailsUrl);
+        const res = await fetch(detailsUrl, MAPS_FETCH_OPTS);
         const data = await res.json();
         if (data.result?.formatted_address) {
           onVerander(data.result.formatted_address);
@@ -229,7 +230,7 @@ export function LocatieInput({
           `https://maps.googleapis.com/maps/api/geocode/json` +
           `?latlng=${loc.coords.latitude},${loc.coords.longitude}` +
           `&language=nl&key=${GOOGLE_API_KEY}`;
-        const res = await fetch(url);
+        const res = await fetch(url, MAPS_FETCH_OPTS);
         const data = await res.json();
         if (data.results?.[0]) {
           onVerander(data.results[0].formatted_address);
