@@ -3,6 +3,11 @@
     "name": "Taximeter Pro",
     "slug": "taximeter-pro",
     "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "taximeter-pro",
@@ -14,24 +19,35 @@
       "backgroundColor": "#0a0a0a"
     },
     "ios": {
-      "buildNumber": "1.0.0",
-      "supportsTablet": false,
-      "bundleIdentifier": "com.taximeter.pro",
+      "buildNumber": "3",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.taximeter_pro",
+      "config": {
+        "googleMapsApiKey": "AIzaSyDbIIcl65uaApHjPd1zslTYfVCAuWnIDCM"
+      },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Taximeter Pro gebruikt uw locatie om uw startlocatie automatisch in te vullen bij het plannen van een rit.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "versionCode": 1,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDbIIcl65uaApHjPd1zslTYfVCAuWnIDCM"
+        }
+      },
+      "versionCode": 12,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#FFD700"
       },
-      "package": "com.taximeter.pro",
+      "package": "com.taximeter_pro",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
@@ -45,7 +61,8 @@
       "lang": "nl",
       "startUrl": "/",
       "display": "standalone",
-      "orientation": "portrait"
+      "orientation": "portrait",
+      "indexHtml": "./index.html"
     },
     "plugins": [
       [
@@ -76,6 +93,14 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://replit.com/"
+      },
+      "eas": {
+        "projectId": "2bdc08c9-5989-4f54-b362-e46236a535fd"
+      }
     }
   }
 }

@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "2bdc08c9-5989-4f54-b362-e46236a535fd"
+      }
+    },
+    "owner": "toygare",
+    "android": {
+      "package": "com.taximeter_pro"
+    }
+  }
+}
