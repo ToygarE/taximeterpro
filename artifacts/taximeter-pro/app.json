@@ -2,7 +2,7 @@
   "expo": {
     "name": "Taximeter Pro",
     "slug": "taximeter-pro",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "platforms": [
       "ios",
       "android",
@@ -19,7 +19,7 @@
       "backgroundColor": "#0a0a0a"
     },
     "ios": {
-      "buildNumber": "3",
+      "buildNumber": "4",
       "supportsTablet": true,
       "bundleIdentifier": "com.taximeter_pro",
       "config": {
@@ -38,7 +38,7 @@
           "apiKey": "AIzaSyDbIIcl65uaApHjPd1zslTYfVCAuWnIDCM"
         }
       },
-      "versionCode": 12,
+      "versionCode": 16,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#FFD700"
