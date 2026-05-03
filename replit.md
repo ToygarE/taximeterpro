@@ -26,6 +26,10 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
 
+## GitHub Sync
+
+Automatic GitHub sync is enabled via the **GitHub Sync** workflow (`scripts/github-sync.mjs`). It runs every 5 minutes and pushes new commits to `origin/main` (https://github.com/ToygarE/taximeterpro) using the `GITHUB_TOKEN` environment variable injected by the Replit GitHub integration. No manual push step is needed.
+
 ## Artifacts
 
 ### Taximeter Pro (`artifacts/taximeter-pro`)
