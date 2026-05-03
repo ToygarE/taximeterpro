@@ -96,6 +96,9 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
           `https://maps.googleapis.com/maps/api/directions/json` +
           `?origin=${encodeURIComponent(startLocatie)}` +
           `&destination=${encodeURIComponent(bestemming)}` +
+          `&mode=driving` +
+          `&departure_time=now` +
+          `&traffic_model=best_guess` +
           `&language=nl&key=${GOOGLE_API_KEY}`;
 
         console.log("[RouteKaart] key aanwezig:", !!GOOGLE_API_KEY, "| van:", startLocatie.substring(0, 20), "naar:", bestemming.substring(0, 20));

@@ -95,45 +95,69 @@ export function LocatieInput({
         if (GOOGLE_API_KEY) {
           setLoadingApi(true);
           try {
-            const url =
+            const baseUrl =
               `https://maps.googleapis.com/maps/api/place/autocomplete/json` +
               `?input=${encodeURIComponent(query)}` +
-              `&components=country:nl|country:be|country:de` +
               `&language=nl` +
               `&key=${GOOGLE_API_KEY}`;
-            const res = await fetch(url);
-            const data = await res.json();
+
+            const [resAddr, resEstab] = await Promise.all([
+              fetch(baseUrl + `&types=geocode&components=country:nl|country:be|country:de`),
+              fetch(baseUrl + `&types=establishment`),
+            ]);
+
             if (latestQueryRef.current !== query) return;
-            if (data.predictions && data.predictions.length > 0) {
-              setSuggesties(
-                data.predictions
-                  .slice(0, 6)
-                  .map((p: {
-                    place_id: string;
-                    description: string;
-                    types?: string[];
-                    structured_formatting?: {
-                      main_text?: string;
-                      secondary_text?: string;
-                    };
-                  }) => ({
-                    place_id: p.place_id,
-                    description: p.description,
-                    mainText: p.structured_formatting?.main_text ?? p.description,
-                    secondaryText: p.structured_formatting?.secondary_text ?? "",
-                    isPoi: !!(p.types && (
-                      p.types.includes("establishment") ||
-                      p.types.includes("point_of_interest") ||
-                      p.types.includes("lodging") ||
-                      p.types.includes("stadium") ||
-                      p.types.includes("airport")
-                    )),
-                  }))
-              );
-            } else {
-              if (latestQueryRef.current === query) {
-                setSuggesties(demoSuggesties(query));
+
+            const [dataAddr, dataEstab] = await Promise.all([
+              resAddr.json(),
+              resEstab.json(),
+            ]);
+
+            if (latestQueryRef.current !== query) return;
+
+            type Prediction = {
+              place_id: string;
+              description: string;
+              types?: string[];
+              structured_formatting?: { main_text?: string; secondary_text?: string };
+            };
+
+            const toewijzingSuggestie = (p: Prediction): Suggestie => ({
+              place_id: p.place_id,
+              description: p.description,
+              mainText: p.structured_formatting?.main_text ?? p.description,
+              secondaryText: p.structured_formatting?.secondary_text ?? "",
+              isPoi: !!(p.types && (
+                p.types.includes("establishment") ||
+                p.types.includes("point_of_interest") ||
+                p.types.includes("lodging") ||
+                p.types.includes("stadium") ||
+                p.types.includes("airport") ||
+                p.types.includes("museum") ||
+                p.types.includes("restaurant") ||
+                p.types.includes("hospital") ||
+                p.types.includes("park") ||
+                p.types.includes("tourist_attraction")
+              )),
+            });
+
+            const adresPreds: Prediction[] = dataAddr.predictions ?? [];
+            const estabPreds: Prediction[] = dataEstab.predictions ?? [];
+
+            const gezienIds = new Set<string>();
+            const samengevoegd: Suggestie[] = [];
+
+            for (const p of [...estabPreds, ...adresPreds]) {
+              if (!gezienIds.has(p.place_id) && samengevoegd.length < 8) {
+                gezienIds.add(p.place_id);
+                samengevoegd.push(toewijzingSuggestie(p));
               }
+            }
+
+            if (samengevoegd.length > 0) {
+              setSuggesties(samengevoegd);
+            } else {
+              setSuggesties(demoSuggesties(query));
             }
           } catch {
             if (latestQueryRef.current === query) {

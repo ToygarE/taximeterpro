@@ -17,7 +17,7 @@ export async function haalRouteData(
 
   const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(
     origin
-  )}&destinations=${encodeURIComponent(destination)}&language=nl&key=${GOOGLE_API_KEY}`;
+  )}&destinations=${encodeURIComponent(destination)}&mode=driving&departure_time=now&traffic_model=best_guess&language=nl&key=${GOOGLE_API_KEY}`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error("API verzoek mislukt");
@@ -34,7 +34,7 @@ export async function haalRouteData(
 
   const el = data.rows[0].elements[0];
   const afstandM: number = el.distance.value;
-  const tijdSec: number = el.duration.value;
+  const tijdSec: number = (el.duration_in_traffic?.value ?? el.duration.value);
 
   return {
     afstandKm: afstandM / 1000,
