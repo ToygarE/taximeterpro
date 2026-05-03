@@ -16,5 +16,15 @@
         "EXPO_PUBLIC_GOOGLE_MAPS_KEY": "$EXPO_PUBLIC_GOOGLE_MAPS_KEY"
       }
     }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6764399767",
+        "ascApiKeyId": "ZQCHAJ7V8P",
+        "ascApiKeyIssuerId": "9781b414-30ff-455b-bec3-f083f9bda26e",
+        "ascApiKeyPath": "/home/runner/.config/eas/asc_api_key.p8"
+      }
+    }
   }
 }
