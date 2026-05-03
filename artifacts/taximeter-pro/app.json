@@ -38,7 +38,7 @@
           "apiKey": "AIzaSyDbIIcl65uaApHjPd1zslTYfVCAuWnIDCM"
         }
       },
-      "versionCode": 16,
+      "versionCode": 17,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#FFD700"
