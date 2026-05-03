@@ -21,7 +21,7 @@
     "ios": {
       "buildNumber": "4",
       "supportsTablet": true,
-      "bundleIdentifier": "com.taximeter_pro",
+      "bundleIdentifier": "com.taximeter.pro",
       "config": {
         "googleMapsApiKey": "AIzaSyDbIIcl65uaApHjPd1zslTYfVCAuWnIDCM"
       },
@@ -81,6 +81,7 @@
         }
       ],
       "expo-web-browser",
+      "./plugins/withFixMapsPodfile.js",
       [
         "expo-location",
         {
