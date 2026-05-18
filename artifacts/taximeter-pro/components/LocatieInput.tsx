@@ -15,19 +15,7 @@ import { useColors } from "@/hooks/useColors";
 
 const PHOTON_URL = "https://photon.komoot.io/api/";
 const PHOTON_REVERSE_URL = "https://photon.komoot.io/reverse";
-
-const DEMO_SUGGESTIES: Suggestie[] = [
-  { place_id: "demo-0", description: "Damrak 1, 1012 LG Amsterdam", mainText: "Damrak 1", secondaryText: "1012 LG Amsterdam", isPoi: false },
-  { place_id: "demo-1", description: "Hotel Krasnapolsky, Dam 9, 1012 JS Amsterdam", mainText: "Hotel Krasnapolsky", secondaryText: "Dam 9, Amsterdam", isPoi: true },
-  { place_id: "demo-2", description: "Johan Cruijff Arena, Arena Boulevard 1, 1101 AX Amsterdam", mainText: "Johan Cruijff Arena", secondaryText: "Amsterdam Zuidoost", isPoi: true },
-  { place_id: "demo-3", description: "Amsterdam Airport Schiphol, 1118 CP Schiphol", mainText: "Amsterdam Airport Schiphol", secondaryText: "Schiphol", isPoi: true },
-  { place_id: "demo-4", description: "Binnenhof 1, 2513 AA Den Haag", mainText: "Binnenhof 1", secondaryText: "2513 AA Den Haag", isPoi: false },
-  { place_id: "demo-5", description: "Coolsingel 40, 3011 AD Rotterdam", mainText: "Coolsingel 40", secondaryText: "3011 AD Rotterdam", isPoi: false },
-  { place_id: "demo-6", description: "Rotterdam Centraal, Stationsplein, 3013 AJ Rotterdam", mainText: "Rotterdam Centraal", secondaryText: "Rotterdam", isPoi: true },
-  { place_id: "demo-7", description: "Markthal Rotterdam, Dominee Jan Scharpstraat 298, Rotterdam", mainText: "Markthal Rotterdam", secondaryText: "Rotterdam", isPoi: true },
-  { place_id: "demo-8", description: "Oudegracht 229, 3511 NK Utrecht", mainText: "Oudegracht 229", secondaryText: "3511 NK Utrecht", isPoi: false },
-  { place_id: "demo-9", description: "Rijksmuseum, Museumstraat 1, 1071 XX Amsterdam", mainText: "Rijksmuseum", secondaryText: "Amsterdam", isPoi: true },
-];
+const MIN_ZOEKLENGTE = 3;
 
 interface Suggestie {
   place_id: string;
@@ -65,6 +53,7 @@ const POI_WAARDEN = new Set([
   "shopping_mall", "department_store", "marketplace", "sports_centre",
   "zoo", "theme_park", "aquarium", "place_of_worship", "nursing_home",
   "clinic", "kindergarten", "college", "bus_station", "ferry_terminal",
+  "mall", "convenience", "fuel", "car_rental", "parking",
 ]);
 
 function bouwAdres(props: PhotonProperties): string {
@@ -89,6 +78,7 @@ function photonNaarSuggestie(f: PhotonFeature): Suggestie | null {
   if (!description) return null;
 
   const heeftNaam = !!props.name;
+
   const mainText = heeftNaam
     ? props.name!
     : props.street
@@ -96,11 +86,27 @@ function photonNaarSuggestie(f: PhotonFeature): Suggestie | null {
       ? `${props.street} ${props.housenumber}`
       : props.street
     : description;
-  const secondaryText = props.city
-    ? props.postcode
-      ? `${props.postcode} ${props.city}`
-      : props.city
-    : props.country ?? "";
+
+  const secondaryDelen: string[] = [];
+  if (heeftNaam && props.street) {
+    secondaryDelen.push(
+      props.housenumber ? `${props.street} ${props.housenumber}` : props.street
+    );
+  }
+  if (props.city) {
+    if (props.postcode) secondaryDelen.push(`${props.postcode} ${props.city}`);
+    else secondaryDelen.push(props.city);
+  } else if (props.district) {
+    secondaryDelen.push(props.district);
+  } else if (props.county) {
+    secondaryDelen.push(props.county);
+  }
+  if (props.country && props.country !== "Netherlands" && props.country !== "Nederland") {
+    secondaryDelen.push(props.country);
+  }
+
+  const secondaryText = secondaryDelen.join(", ");
+
   const isPoi =
     heeftNaam &&
     (POI_WAARDEN.has(props.osm_value ?? "") || POI_WAARDEN.has(props.osm_key ?? ""));
@@ -115,13 +121,6 @@ interface Props {
   onVerander: (val: string) => void;
   icoon?: string;
   toonLocatieKnop?: boolean;
-}
-
-function demoSuggesties(tekst: string): Suggestie[] {
-  const q = tekst.toLowerCase();
-  return DEMO_SUGGESTIES.filter(
-    (s) => s.description.toLowerCase().includes(q) || s.mainText.toLowerCase().includes(q)
-  ).slice(0, 6);
 }
 
 export function LocatieInput({
@@ -148,7 +147,7 @@ export function LocatieInput({
       onVerander(tekst);
       latestQueryRef.current = tekst;
 
-      if (tekst.length < 1) {
+      if (tekst.length < MIN_ZOEKLENGTE) {
         setSuggesties([]);
         return;
       }
@@ -170,7 +169,7 @@ export function LocatieInput({
           } catch {}
 
           const url =
-            `${PHOTON_URL}?q=${encodeURIComponent(query)}&limit=8&lang=nl` +
+            `${PHOTON_URL}?q=${encodeURIComponent(query)}&limit=10&lang=nl` +
             (lat !== null && lon !== null ? `&lat=${lat}&lon=${lon}` : "");
 
           const res = await fetch(url);
@@ -186,11 +185,11 @@ export function LocatieInput({
           if (gevonden.length > 0) {
             setSuggesties(gevonden);
           } else {
-            setSuggesties(demoSuggesties(query));
+            setSuggesties([]);
           }
         } catch {
           if (latestQueryRef.current === query) {
-            setSuggesties(demoSuggesties(query));
+            setSuggesties([]);
           }
         } finally {
           if (latestQueryRef.current === query) {
@@ -220,7 +219,7 @@ export function LocatieInput({
   const handleFocus = () => {
     if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
     setGefocust(true);
-    if (waarde.length >= 1) {
+    if (waarde.length >= MIN_ZOEKLENGTE) {
       zoekSuggesties(waarde);
     }
   };

@@ -1,0 +1,23 @@
+De huidige zoekfunctie met Photon/OSM toont nog niet de juiste suggesties. Als ik 'Zaanse' typ moet 'Zaanse Schans' verschijnen, en als ik 'OLVG' typ moeten de specifieke vestigingen (OLVG Oost en OLVG West) als losse opties in de combobox verschijnen. Daarnaast moeten ook alle straatnamen, hotels en bedrijven vlekkeloos werken als suggestie.
+
+Voer de volgende aanpassingen exact uit:
+
+1. Optimaliseer de Autocomplete (Photon API):
+
+Pas de fetch-URL naar Photon aan zodat deze breder zoekt en geen resultaten filtert. Gebruik de huidige GPS-locatie van de gebruiker (lat en lon) voor proximiteit, zodat lokale resultaten bovenaan komen. Dit voorkomt dat een chauffeur in Amsterdam resultaten uit Friesland als eerste ziet.
+
+Zorg dat de dropdown/combobox niet alleen de hoofdnaam van de locatie toont, maar ook de straatnaam en de stad (bijv. OLVG West - Jan Tooropstraat, Amsterdam). Hierdoor ziet de chauffeur direct het verschil tussen Oost en West.
+
+Zorg dat de zoekopdracht getriggerd wordt vanaf 3 getypte letters en dat de lijst direct update in een soepele FlatList of react-native-autocomplete-dropdown.
+
+2. Elimineer Google Cloud volledig voor de Routeberekening (Kostenbesparing):
+
+De app gebruikt nu nog de betaalde Google Distance Matrix API en Directions API zodra er op 'Bereken Ritprijs' wordt gedrukt. Dit gaat duizenden dollars kosten bij 30.000 gebruikers en moet NU worden vervangen.
+
+Vervang de Distance Matrix API (reistijd en afstand) en de Directions API (de routelijn op de kaart) volledig door de gratis open-source OSRM (Open Source Routing Machine) API via de officiële demo-server (https://router.project-osrm.org/route/v1/driving/...) of implementeer een vergelijkbare gratis routing service.
+
+Zorg dat de reistijd (in minuten) en de afstand (in kilometers) die uit OSRM rollen, direct worden gebruikt om de ritprijs te berekenen in de app.
+
+3. Visuele kaart:
+
+De visuele kaart zelf (react-native-maps) mag de gratis standaardkaart van de telefoon (Apple Maps op iOS, Google Maps op Android) blijven tonen. Er mogen géén cloud-endpoints van Google meer worden aangeroepen.

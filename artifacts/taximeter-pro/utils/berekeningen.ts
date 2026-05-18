@@ -1,44 +1,59 @@
 import type { ExtraKosten, RitResultaat, TarifSettings } from "@/context/TaximeterContext";
 
-const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
+const PHOTON_URL = "https://photon.komoot.io/api/";
+const OSRM_URL = "https://router.project-osrm.org/route/v1/driving/";
 
 interface RouteData {
   afstandKm: number;
   tijdMin: number;
 }
 
+async function geocodeerAdres(adres: string): Promise<[number, number] | null> {
+  try {
+    const res = await fetch(
+      `${PHOTON_URL}?q=${encodeURIComponent(adres)}&limit=1&lang=nl`
+    );
+    const data = await res.json();
+    if (data.features?.[0]) {
+      const [lon, lat] = data.features[0].geometry.coordinates as [number, number];
+      return [lon, lat];
+    }
+  } catch {}
+  return null;
+}
+
 export async function haalRouteData(
   origin: string,
   destination: string
 ): Promise<RouteData> {
-  if (!GOOGLE_API_KEY) {
-    throw new Error("Geen Google Maps API sleutel geconfigureerd");
+  const [startCoord, eindCoord] = await Promise.all([
+    geocodeerAdres(origin),
+    geocodeerAdres(destination),
+  ]);
+
+  if (!startCoord || !eindCoord) {
+    throw new Error("Locaties niet gevonden via Photon");
   }
 
-  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(
-    origin
-  )}&destinations=${encodeURIComponent(destination)}&mode=driving&departure_time=now&traffic_model=best_guess&language=nl&key=${GOOGLE_API_KEY}`;
+  const [startLon, startLat] = startCoord;
+  const [eindLon, eindLat] = eindCoord;
+
+  const url =
+    `${OSRM_URL}${startLon},${startLat};${eindLon},${eindLat}` +
+    `?overview=false`;
 
   const res = await fetch(url);
-  if (!res.ok) throw new Error("API verzoek mislukt");
+  if (!res.ok) throw new Error("OSRM verzoek mislukt");
 
   const data = await res.json();
 
-  if (
-    data.status !== "OK" ||
-    !data.rows?.[0]?.elements?.[0] ||
-    data.rows[0].elements[0].status !== "OK"
-  ) {
-    throw new Error("Route niet gevonden");
+  if (data.code !== "Ok" || !data.routes?.[0]) {
+    throw new Error("Route niet gevonden via OSRM");
   }
 
-  const el = data.rows[0].elements[0];
-  const afstandM: number = el.distance.value;
-  const tijdSec: number = (el.duration_in_traffic?.value ?? el.duration.value);
-
   return {
-    afstandKm: afstandM / 1000,
-    tijdMin: tijdSec / 60,
+    afstandKm: data.routes[0].distance / 1000,
+    tijdMin: data.routes[0].duration / 60,
   };
 }
 

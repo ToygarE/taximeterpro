@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Image, Platform, StyleSheet, Text, View } from "react-native";
+import { Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
-const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
+const PHOTON_URL = "https://photon.komoot.io/api/";
+const OSRM_URL = "https://router.project-osrm.org/route/v1/driving/";
 
 interface Props {
   startLocatie: string;
@@ -16,124 +17,174 @@ interface Coordinate {
   longitude: number;
 }
 
-async function geocode(adres: string): Promise<Coordinate | null> {
-  if (!GOOGLE_API_KEY) return null;
+interface RouteState {
+  startCoord: Coordinate | null;
+  eindCoord: Coordinate | null;
+  routeCoords: Coordinate[];
+  region: {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  } | null;
+}
+
+async function geocodeerAdres(adres: string): Promise<Coordinate | null> {
   try {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(adres)}&language=nl&key=${GOOGLE_API_KEY}`;
-    const res = await fetch(url);
+    const res = await fetch(
+      `${PHOTON_URL}?q=${encodeURIComponent(adres)}&limit=1&lang=nl`
+    );
     const data = await res.json();
-    if (data.results?.[0]) {
-      const loc = data.results[0].geometry.location;
-      return { latitude: loc.lat, longitude: loc.lng };
+    if (data.features?.[0]) {
+      const [lon, lat] = data.features[0].geometry.coordinates as [number, number];
+      return { latitude: lat, longitude: lon };
     }
   } catch {}
   return null;
 }
 
-function bouwStaticMapUrl(
+async function haalOsrmRoute(
   start: Coordinate,
-  eind: Coordinate,
-  encodedPolyline: string | null,
-  breedte: number,
-  hoogte: number
-): string {
-  const w = Math.round(breedte * 2);
-  const h = Math.round(hoogte * 2);
+  eind: Coordinate
+): Promise<Coordinate[]> {
+  try {
+    const url =
+      `${OSRM_URL}${start.longitude},${start.latitude};${eind.longitude},${eind.latitude}` +
+      `?overview=full&geometries=geojson`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.code === "Ok" && data.routes?.[0]) {
+      return (data.routes[0].geometry.coordinates as [number, number][]).map(
+        ([lon, lat]) => ({ latitude: lat, longitude: lon })
+      );
+    }
+  } catch {}
+  return [];
+}
 
-  const darkStyles = [
-    "style=element:geometry|color:0x1a1a2e",
-    "style=element:labels.text.fill|color:0x888888",
-    "style=element:labels.text.stroke|color:0x1a1a2e",
-    "style=feature:road|element:geometry|color:0x2d2d2d",
-    "style=feature:road.arterial|element:geometry|color:0x3a3a3a",
-    "style=feature:road.highway|element:geometry|color:0x4a4a4a",
-    "style=feature:water|element:geometry|color:0x0d1117",
-    "style=feature:poi|visibility:off",
-    "style=feature:transit|visibility:off",
-  ].join("&");
+function berekenRegion(
+  start: Coordinate,
+  eind: Coordinate
+): RouteState["region"] {
+  const minLat = Math.min(start.latitude, eind.latitude);
+  const maxLat = Math.max(start.latitude, eind.latitude);
+  const minLon = Math.min(start.longitude, eind.longitude);
+  const maxLon = Math.max(start.longitude, eind.longitude);
+  const latDelta = Math.max((maxLat - minLat) * 1.5, 0.02);
+  const lonDelta = Math.max((maxLon - minLon) * 1.5, 0.02);
+  return {
+    latitude: (minLat + maxLat) / 2,
+    longitude: (minLon + maxLon) / 2,
+    latitudeDelta: latDelta,
+    longitudeDelta: lonDelta,
+  };
+}
 
-  const markerStart = `markers=color:0xFFD700|label:A|${start.latitude},${start.longitude}`;
-  const markerEind = `markers=color:0xFF6B35|label:B|${eind.latitude},${eind.longitude}`;
-
-  const path = encodedPolyline
-    ? `path=color:0xFFD700FF|weight:4|enc:${encodeURIComponent(encodedPolyline)}`
-    : `path=color:0xFFD700FF|weight:5|geodesic:true|${start.latitude},${start.longitude}|${eind.latitude},${eind.longitude}`;
+function WebKaartPlaceholder({
+  startLocatie,
+  bestemming,
+  hoogte,
+  colors,
+}: {
+  startLocatie: string;
+  bestemming: string;
+  hoogte: number;
+  colors: ReturnType<typeof useColors>;
+}) {
+  const mapsUrl =
+    `https://www.google.com/maps/dir/?api=1` +
+    `&origin=${encodeURIComponent(startLocatie)}` +
+    `&destination=${encodeURIComponent(bestemming)}` +
+    `&travelmode=driving`;
 
   return (
-    `https://maps.googleapis.com/maps/api/staticmap` +
-    `?size=${w}x${h}` +
-    `&scale=1` +
-    `&maptype=roadmap` +
-    `&${darkStyles}` +
-    `&${markerStart}` +
-    `&${markerEind}` +
-    `&${path}` +
-    `&key=${GOOGLE_API_KEY}`
+    <TouchableOpacity
+      onPress={() => Linking.openURL(mapsUrl)}
+      activeOpacity={0.8}
+      style={[
+        styles.placeholder,
+        { height: hoogte, backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
+      <Text style={[styles.placeholderTekst, { color: colors.mutedForeground }]}>
+        {startLocatie}
+      </Text>
+      <Text style={[styles.pijl, { color: colors.primary }]}>↓</Text>
+      <Text style={[styles.placeholderTekst, { color: colors.mutedForeground }]}>
+        {bestemming}
+      </Text>
+      <Text style={[styles.linkTekst, { color: colors.primary }]}>
+        Bekijk route op kaart ↗
+      </Text>
+    </TouchableOpacity>
   );
 }
 
 export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }: Props) {
   const colors = useColors();
-  const [mapUrl, setMapUrl] = useState<string | null>(null);
+  const [routeState, setRouteState] = useState<RouteState>({
+    startCoord: null,
+    eindCoord: null,
+    routeCoords: [],
+    region: null,
+  });
+  const [laden, setLaden] = useState(true);
   const [fout, setFout] = useState(false);
-  const [breedte, setBreedte] = useState(350);
 
   useEffect(() => {
-    if (!startLocatie || !bestemming || !GOOGLE_API_KEY) {
+    if (!startLocatie || !bestemming) {
       setFout(true);
+      setLaden(false);
       return;
     }
     setFout(false);
-    setMapUrl(null);
+    setLaden(true);
+    setRouteState({ startCoord: null, eindCoord: null, routeCoords: [], region: null });
 
     (async () => {
       try {
-        let encodedPolyline: string | null = null;
-        let start: Coordinate | null = null;
-        let eind: Coordinate | null = null;
+        const [start, eind] = await Promise.all([
+          geocodeerAdres(startLocatie),
+          geocodeerAdres(bestemming),
+        ]);
 
-        const dirUrl =
-          `https://maps.googleapis.com/maps/api/directions/json` +
-          `?origin=${encodeURIComponent(startLocatie)}` +
-          `&destination=${encodeURIComponent(bestemming)}` +
-          `&mode=driving` +
-          `&departure_time=now` +
-          `&traffic_model=best_guess` +
-          `&language=nl&key=${GOOGLE_API_KEY}`;
-
-        console.log("[RouteKaart] key aanwezig:", !!GOOGLE_API_KEY, "| van:", startLocatie.substring(0, 20), "naar:", bestemming.substring(0, 20));
-
-        const res = await fetch(dirUrl);
-        const data = await res.json();
-
-        console.log("[RouteKaart] Directions status:", data.status, "| routes:", data.routes?.length ?? 0);
-
-        if (data.status === "OK" && data.routes?.[0]) {
-          const route = data.routes[0];
-          const leg = route.legs[0];
-          start = { latitude: leg.start_location.lat, longitude: leg.start_location.lng };
-          eind = { latitude: leg.end_location.lat, longitude: leg.end_location.lng };
-          encodedPolyline = route.overview_polyline.points;
-          console.log("[RouteKaart] Polyline ontvangen, lengte:", encodedPolyline.length);
-        } else {
-          console.warn("[RouteKaart] Directions mislukt (status:", data.status, ") – geocoding fallback");
-          [start, eind] = await Promise.all([geocode(startLocatie), geocode(bestemming)]);
+        if (!start || !eind) {
+          setFout(true);
+          setLaden(false);
+          return;
         }
 
-        if (!start || !eind) { setFout(true); return; }
+        const [routeCoords] = await Promise.all([haalOsrmRoute(start, eind)]);
 
-        const url = bouwStaticMapUrl(start, eind, encodedPolyline, breedte, hoogte);
-        console.log("[RouteKaart] Kaart-URL lengte:", url.length, "| polyline:", encodedPolyline ? "ja" : "nee (rechte lijn)");
-        setMapUrl(url);
-        onMapUrl?.(url);
-      } catch (err) {
-        console.error("[RouteKaart] Fout:", err);
+        const region = berekenRegion(start, eind);
+
+        setRouteState({ startCoord: start, eindCoord: eind, routeCoords, region });
+        onMapUrl?.(
+          `https://www.google.com/maps/dir/?api=1` +
+            `&origin=${encodeURIComponent(startLocatie)}` +
+            `&destination=${encodeURIComponent(bestemming)}` +
+            `&travelmode=driving`
+        );
+        setLaden(false);
+      } catch {
         setFout(true);
+        setLaden(false);
       }
     })();
-  }, [startLocatie, bestemming, breedte, hoogte]);
+  }, [startLocatie, bestemming]);
 
-  if (fout || !GOOGLE_API_KEY) {
+  if (Platform.OS === "web") {
+    return (
+      <WebKaartPlaceholder
+        startLocatie={startLocatie}
+        bestemming={bestemming}
+        hoogte={hoogte}
+        colors={colors}
+      />
+    );
+  }
+
+  if (fout) {
     return (
       <View
         style={[
@@ -152,7 +203,7 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
     );
   }
 
-  if (!mapUrl) {
+  if (laden || !routeState.region) {
     return (
       <View
         style={[
@@ -167,22 +218,46 @@ export function RouteKaart({ startLocatie, bestemming, hoogte = 250, onMapUrl }:
     );
   }
 
+  const NativeMap = require("react-native-maps").default;
+  const { Polyline, Marker } = require("react-native-maps");
+
   return (
-    <View
-      style={[styles.kaart, { height: hoogte, borderColor: colors.border }]}
-      onLayout={(e) => setBreedte(e.nativeEvent.layout.width)}
-    >
-      <Image
-        key={mapUrl}
-        source={
-          Platform.OS === "ios"
-            ? { uri: mapUrl, cache: "reload" }
-            : { uri: mapUrl }
-        }
+    <View style={[styles.kaart, { height: hoogte, borderColor: colors.border }]}>
+      <NativeMap
         style={StyleSheet.absoluteFillObject}
-        resizeMode="cover"
-        onError={() => setFout(true)}
-      />
+        region={routeState.region}
+        scrollEnabled={false}
+        zoomEnabled={false}
+        pitchEnabled={false}
+        rotateEnabled={false}
+        showsUserLocation={false}
+        showsMyLocationButton={false}
+        showsCompass={false}
+        showsScale={false}
+        toolbarEnabled={false}
+      >
+        {routeState.routeCoords.length > 1 && (
+          <Polyline
+            coordinates={routeState.routeCoords}
+            strokeColor="#FFD700"
+            strokeWidth={4}
+          />
+        )}
+        {routeState.startCoord && (
+          <Marker
+            coordinate={routeState.startCoord}
+            pinColor="#FFD700"
+            title="Start"
+          />
+        )}
+        {routeState.eindCoord && (
+          <Marker
+            coordinate={routeState.eindCoord}
+            pinColor="#FF6B35"
+            title="Bestemming"
+          />
+        )}
+      </NativeMap>
     </View>
   );
 }
@@ -211,5 +286,10 @@ const styles = StyleSheet.create({
   },
   ladenTekst: {
     fontSize: 13,
+  },
+  linkTekst: {
+    fontSize: 13,
+    marginTop: 4,
+    fontWeight: "600",
   },
 });
