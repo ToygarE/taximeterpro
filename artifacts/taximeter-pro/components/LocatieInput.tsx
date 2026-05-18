@@ -13,24 +13,20 @@ import {
 } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
-const GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY ?? "";
+const PHOTON_URL = "https://photon.komoot.io/api/";
+const PHOTON_REVERSE_URL = "https://photon.komoot.io/reverse";
 
 const DEMO_SUGGESTIES: Suggestie[] = [
-  { place_id: "demo-0", description: "Damrak 1, 1012 LG Amsterdam", mainText: "Damrak 1", secondaryText: "Amsterdam", isPoi: false },
-  { place_id: "demo-1", description: "Hotel Krasnapolsky, Dam 9, Amsterdam", mainText: "Hotel Krasnapolsky", secondaryText: "Dam 9, Amsterdam", isPoi: true },
-  { place_id: "demo-2", description: "Johan Cruijff Arena, Amsterdam Zuidoost", mainText: "Johan Cruijff Arena", secondaryText: "Amsterdam Zuidoost", isPoi: true },
+  { place_id: "demo-0", description: "Damrak 1, 1012 LG Amsterdam", mainText: "Damrak 1", secondaryText: "1012 LG Amsterdam", isPoi: false },
+  { place_id: "demo-1", description: "Hotel Krasnapolsky, Dam 9, 1012 JS Amsterdam", mainText: "Hotel Krasnapolsky", secondaryText: "Dam 9, Amsterdam", isPoi: true },
+  { place_id: "demo-2", description: "Johan Cruijff Arena, Arena Boulevard 1, 1101 AX Amsterdam", mainText: "Johan Cruijff Arena", secondaryText: "Amsterdam Zuidoost", isPoi: true },
   { place_id: "demo-3", description: "Amsterdam Airport Schiphol, 1118 CP Schiphol", mainText: "Amsterdam Airport Schiphol", secondaryText: "Schiphol", isPoi: true },
-  { place_id: "demo-4", description: "Binnenhof 1, 2513 AA Den Haag", mainText: "Binnenhof 1", secondaryText: "Den Haag", isPoi: false },
-  { place_id: "demo-5", description: "Coolsingel 40, 3011 AD Rotterdam", mainText: "Coolsingel 40", secondaryText: "Rotterdam", isPoi: false },
-  { place_id: "demo-6", description: "Rotterdam Centraal, Stationsplein, Rotterdam", mainText: "Rotterdam Centraal", secondaryText: "Stationsplein, Rotterdam", isPoi: true },
+  { place_id: "demo-4", description: "Binnenhof 1, 2513 AA Den Haag", mainText: "Binnenhof 1", secondaryText: "2513 AA Den Haag", isPoi: false },
+  { place_id: "demo-5", description: "Coolsingel 40, 3011 AD Rotterdam", mainText: "Coolsingel 40", secondaryText: "3011 AD Rotterdam", isPoi: false },
+  { place_id: "demo-6", description: "Rotterdam Centraal, Stationsplein, 3013 AJ Rotterdam", mainText: "Rotterdam Centraal", secondaryText: "Rotterdam", isPoi: true },
   { place_id: "demo-7", description: "Markthal Rotterdam, Dominee Jan Scharpstraat 298, Rotterdam", mainText: "Markthal Rotterdam", secondaryText: "Rotterdam", isPoi: true },
-  { place_id: "demo-8", description: "Oudegracht 229, 3511 NK Utrecht", mainText: "Oudegracht 229", secondaryText: "Utrecht", isPoi: false },
-  { place_id: "demo-9", description: "Rijksmuseum, Museumstraat 1, Amsterdam", mainText: "Rijksmuseum", secondaryText: "Museumstraat 1, Amsterdam", isPoi: true },
-  { place_id: "demo-10", description: "De Bijenkorf, Dam 1, Amsterdam", mainText: "De Bijenkorf", secondaryText: "Dam 1, Amsterdam", isPoi: true },
-  { place_id: "demo-11", description: "Keizersgracht 100, 1015 CK Amsterdam", mainText: "Keizersgracht 100", secondaryText: "Amsterdam", isPoi: false },
-  { place_id: "demo-12", description: "Vrijthof 47, 6211 LE Maastricht", mainText: "Vrijthof 47", secondaryText: "Maastricht", isPoi: false },
-  { place_id: "demo-13", description: "Grote Markt 1, 9712 HN Groningen", mainText: "Grote Markt 1", secondaryText: "Groningen", isPoi: false },
-  { place_id: "demo-14", description: "Eindhoven Airport, Luchthavenweg 25, Eindhoven", mainText: "Eindhoven Airport", secondaryText: "Luchthavenweg, Eindhoven", isPoi: true },
+  { place_id: "demo-8", description: "Oudegracht 229, 3511 NK Utrecht", mainText: "Oudegracht 229", secondaryText: "3511 NK Utrecht", isPoi: false },
+  { place_id: "demo-9", description: "Rijksmuseum, Museumstraat 1, 1071 XX Amsterdam", mainText: "Rijksmuseum", secondaryText: "Amsterdam", isPoi: true },
 ];
 
 interface Suggestie {
@@ -39,6 +35,78 @@ interface Suggestie {
   mainText: string;
   secondaryText: string;
   isPoi: boolean;
+}
+
+interface PhotonProperties {
+  osm_id?: number;
+  osm_type?: string;
+  osm_key?: string;
+  osm_value?: string;
+  name?: string;
+  street?: string;
+  housenumber?: string;
+  postcode?: string;
+  city?: string;
+  district?: string;
+  county?: string;
+  country?: string;
+  type?: string;
+}
+
+interface PhotonFeature {
+  geometry: { coordinates: [number, number] };
+  properties: PhotonProperties;
+}
+
+const POI_WAARDEN = new Set([
+  "hospital", "hotel", "restaurant", "museum", "stadium", "airport",
+  "station", "university", "school", "theatre", "cinema", "supermarket",
+  "park", "attraction", "monument", "library", "pharmacy", "bank",
+  "shopping_mall", "department_store", "marketplace", "sports_centre",
+  "zoo", "theme_park", "aquarium", "place_of_worship", "nursing_home",
+  "clinic", "kindergarten", "college", "bus_station", "ferry_terminal",
+]);
+
+function bouwAdres(props: PhotonProperties): string {
+  const delen: string[] = [];
+  if (props.name) delen.push(props.name);
+  if (props.street) {
+    delen.push(props.housenumber ? `${props.street} ${props.housenumber}` : props.street);
+  }
+  if (props.postcode && props.city) delen.push(`${props.postcode} ${props.city}`);
+  else if (props.city) delen.push(props.city);
+  else if (props.district) delen.push(props.district);
+  else if (props.county) delen.push(props.county);
+  if (props.country && props.country !== "Netherlands" && props.country !== "Nederland") {
+    delen.push(props.country);
+  }
+  return delen.filter(Boolean).join(", ");
+}
+
+function photonNaarSuggestie(f: PhotonFeature): Suggestie | null {
+  const props = f.properties;
+  const description = bouwAdres(props);
+  if (!description) return null;
+
+  const heeftNaam = !!props.name;
+  const mainText = heeftNaam
+    ? props.name!
+    : props.street
+    ? props.housenumber
+      ? `${props.street} ${props.housenumber}`
+      : props.street
+    : description;
+  const secondaryText = props.city
+    ? props.postcode
+      ? `${props.postcode} ${props.city}`
+      : props.city
+    : props.country ?? "";
+  const isPoi =
+    heeftNaam &&
+    (POI_WAARDEN.has(props.osm_value ?? "") || POI_WAARDEN.has(props.osm_key ?? ""));
+  const placeId = `${props.osm_type ?? "X"}${props.osm_id ?? String(Math.random())}`;
+
+  return { place_id: placeId, description, mainText, secondaryText, isPoi };
 }
 
 interface Props {
@@ -52,9 +120,7 @@ interface Props {
 function demoSuggesties(tekst: string): Suggestie[] {
   const q = tekst.toLowerCase();
   return DEMO_SUGGESTIES.filter(
-    (s) =>
-      s.description.toLowerCase().includes(q) ||
-      s.mainText.toLowerCase().includes(q)
+    (s) => s.description.toLowerCase().includes(q) || s.mainText.toLowerCase().includes(q)
   ).slice(0, 6);
 }
 
@@ -91,95 +157,52 @@ export function LocatieInput({
 
       searchTimeoutRef.current = setTimeout(async () => {
         const query = tekst;
-
-        if (GOOGLE_API_KEY) {
-          setLoadingApi(true);
+        setLoadingApi(true);
+        try {
+          let lat: number | null = null;
+          let lon: number | null = null;
           try {
-            const baseUrl =
-              `https://maps.googleapis.com/maps/api/place/autocomplete/json` +
-              `?input=${encodeURIComponent(query)}` +
-              `&language=nl` +
-              `&key=${GOOGLE_API_KEY}`;
-
-            const [resAddr, resEstab] = await Promise.all([
-              fetch(baseUrl + `&types=geocode&components=country:nl|country:be|country:de`),
-              fetch(baseUrl + `&types=establishment`),
-            ]);
-
-            if (latestQueryRef.current !== query) return;
-
-            const [dataAddr, dataEstab] = await Promise.all([
-              resAddr.json(),
-              resEstab.json(),
-            ]);
-
-            if (latestQueryRef.current !== query) return;
-
-            type Prediction = {
-              place_id: string;
-              description: string;
-              types?: string[];
-              structured_formatting?: { main_text?: string; secondary_text?: string };
-            };
-
-            const toewijzingSuggestie = (p: Prediction): Suggestie => ({
-              place_id: p.place_id,
-              description: p.description,
-              mainText: p.structured_formatting?.main_text ?? p.description,
-              secondaryText: p.structured_formatting?.secondary_text ?? "",
-              isPoi: !!(p.types && (
-                p.types.includes("establishment") ||
-                p.types.includes("point_of_interest") ||
-                p.types.includes("lodging") ||
-                p.types.includes("stadium") ||
-                p.types.includes("airport") ||
-                p.types.includes("museum") ||
-                p.types.includes("restaurant") ||
-                p.types.includes("hospital") ||
-                p.types.includes("park") ||
-                p.types.includes("tourist_attraction")
-              )),
-            });
-
-            const adresPreds: Prediction[] = dataAddr.predictions ?? [];
-            const estabPreds: Prediction[] = dataEstab.predictions ?? [];
-
-            const gezienIds = new Set<string>();
-            const samengevoegd: Suggestie[] = [];
-
-            for (const p of [...estabPreds, ...adresPreds]) {
-              if (!gezienIds.has(p.place_id) && samengevoegd.length < 8) {
-                gezienIds.add(p.place_id);
-                samengevoegd.push(toewijzingSuggestie(p));
-              }
+            const loc = await Location.getLastKnownPositionAsync();
+            if (loc) {
+              lat = loc.coords.latitude;
+              lon = loc.coords.longitude;
             }
+          } catch {}
 
-            if (samengevoegd.length > 0) {
-              setSuggesties(samengevoegd);
-            } else {
-              setSuggesties(demoSuggesties(query));
-            }
-          } catch {
-            if (latestQueryRef.current === query) {
-              setSuggesties(demoSuggesties(query));
-            }
-          } finally {
-            if (latestQueryRef.current === query) {
-              setLoadingApi(false);
-            }
+          const url =
+            `${PHOTON_URL}?q=${encodeURIComponent(query)}&limit=8&lang=nl` +
+            (lat !== null && lon !== null ? `&lat=${lat}&lon=${lon}` : "");
+
+          const res = await fetch(url);
+          if (latestQueryRef.current !== query) return;
+          const data = await res.json();
+          if (latestQueryRef.current !== query) return;
+
+          const gevonden: Suggestie[] = (data.features ?? [])
+            .map((f: PhotonFeature) => photonNaarSuggestie(f))
+            .filter((s: Suggestie | null): s is Suggestie => s !== null)
+            .slice(0, 8);
+
+          if (gevonden.length > 0) {
+            setSuggesties(gevonden);
+          } else {
+            setSuggesties(demoSuggesties(query));
           }
-        } else {
-          const demo = demoSuggesties(query);
+        } catch {
           if (latestQueryRef.current === query) {
-            setSuggesties(demo);
+            setSuggesties(demoSuggesties(query));
+          }
+        } finally {
+          if (latestQueryRef.current === query) {
+            setLoadingApi(false);
           }
         }
-      }, 250);
+      }, 300);
     },
     [onVerander]
   );
 
-  const kiesSuggestie = async (s: Suggestie) => {
+  const kiesSuggestie = (s: Suggestie) => {
     isSelectingRef.current = true;
     if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
@@ -188,27 +211,6 @@ export function LocatieInput({
     latestQueryRef.current = s.description;
     setSuggesties([]);
     setGefocust(false);
-
-    if (GOOGLE_API_KEY && !s.place_id.startsWith("demo-")) {
-      setLoadingApi(true);
-      try {
-        const detailsUrl =
-          `https://maps.googleapis.com/maps/api/place/details/json` +
-          `?place_id=${encodeURIComponent(s.place_id)}` +
-          `&fields=formatted_address,geometry` +
-          `&language=nl` +
-          `&key=${GOOGLE_API_KEY}`;
-        const res = await fetch(detailsUrl);
-        const data = await res.json();
-        if (data.result?.formatted_address) {
-          onVerander(data.result.formatted_address);
-          latestQueryRef.current = data.result.formatted_address;
-        }
-      } catch {}
-      finally {
-        setLoadingApi(false);
-      }
-    }
 
     setTimeout(() => {
       isSelectingRef.current = false;
@@ -248,19 +250,22 @@ export function LocatieInput({
       const loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
-      if (GOOGLE_API_KEY) {
-        const url =
-          `https://maps.googleapis.com/maps/api/geocode/json` +
-          `?latlng=${loc.coords.latitude},${loc.coords.longitude}` +
-          `&language=nl&key=${GOOGLE_API_KEY}`;
-        const res = await fetch(url);
+
+      try {
+        const reverseUrl =
+          `${PHOTON_REVERSE_URL}?lat=${loc.coords.latitude}&lon=${loc.coords.longitude}&lang=nl`;
+        const res = await fetch(reverseUrl);
         const data = await res.json();
-        if (data.results?.[0]) {
-          onVerander(data.results[0].formatted_address);
-          setSuggesties([]);
-          return;
+        if (data.features?.[0]) {
+          const adres = bouwAdres(data.features[0].properties);
+          if (adres) {
+            onVerander(adres);
+            setSuggesties([]);
+            return;
+          }
         }
-      }
+      } catch {}
+
       const [adres] = await Location.reverseGeocodeAsync({
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
@@ -420,14 +425,6 @@ export function LocatieInput({
               </TouchableOpacity>
             )}
           />
-          {!GOOGLE_API_KEY && (
-            <View style={[styles.demoRij, { borderTopColor: colors.border }]}>
-              <Ionicons name="information-circle-outline" size={11} color={colors.mutedForeground} />
-              <Text style={[styles.demoTekst, { color: colors.mutedForeground }]}>
-                Demo-modus — voeg Google Maps API-sleutel toe
-              </Text>
-            </View>
-          )}
         </View>
       )}
     </View>
@@ -460,6 +457,4 @@ const styles = StyleSheet.create({
   suggestieTekstWrapper: { flex: 1, gap: 1 },
   suggestieHoofd: { fontSize: 14, fontFamily: "Inter_500Medium" },
   suggestieSub: { fontSize: 12, fontFamily: "Inter_400Regular" },
-  demoRij: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderTopWidth: 1 },
-  demoTekst: { fontSize: 11, fontFamily: "Inter_400Regular", flex: 1 },
 });

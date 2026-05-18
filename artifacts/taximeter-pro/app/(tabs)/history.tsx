@@ -69,9 +69,20 @@ export default function GeschiedenisScreen() {
             .map((ek) => ek.beschrijving + ": € " + ek.bedrag.toFixed(2).replace(".", ","))
             .join("\n")
         : "") +
-      "\n\n📍 Bekijk route:\n" + googleMapsUrl + "\n\n" +
-      "Berekend via https://taximeterpro.nl";
-    try { await Share.share({ message: tekst, title: "Taximeter Pro - Ritprijs" }); } catch {}
+      "\n\nBerekend via https://taximeterpro.nl";
+    try {
+      if (Platform.OS === "ios") {
+        await Share.share({
+          message: tekst + "\n\n📍 Klik hier om de route te bekijken ↗",
+          url: googleMapsUrl,
+        });
+      } else {
+        await Share.share({
+          message: tekst + "\n\n📍 Klik hier om de route te bekijken:\n" + googleMapsUrl,
+          title: "Taximeter Pro - Ritprijs",
+        });
+      }
+    } catch {}
   };
 
   const verwijderRit = (item: RitResultaat) => {

@@ -1,0 +1,37 @@
+"Ik wil de Google Maps/Places Cloud API's volledig uit de applicatie en de website-bestanden verwijderen om kosten te elimineren. We stappen over op een gratis native variant voor het zoeken. Daarnaast wil ik de functionaliteit voor het delen van ritten (via WhatsApp, Mail, etc.) drastisch compacter en professioneler maken. Voer de volgende taken exact uit:
+
+1. Techniek (App - Zoekfunctie):
+
+Verwijder de bibliotheek react-native-google-places-autocomplete uit het project.
+
+Bouw de zoekvelden (startlocatie en bestemming) om naar de Photon API (OpenStreetMap) via een fetch-opdracht: https://photon.komoot.io/api/?q={zoekterm}&lat={currentLat}&lon={currentLon}&limit=5&lang=nl.
+
+Zorg dat de huidige GPS-coördinaten (via expo-location) altijd worden meegegeven aan deze URL, zodat lokale suggesties (zoals de juiste OLVG-vestiging of 'Zaanse Schans' bij het typen van 'Zaanse') direct bovenaan in de combobox verschijnen.
+
+Laat de visuele kaartweergave (react-native-maps) intact; deze mag de gratis Google-kaart blijven tonen.
+
+2. Compact Delen functionaliteit (WhatsApp / Mail optimalisatie):
+Pas de functie aan waarmee het ritbericht (zoals getoond in image_e9f72a.jpg) wordt gegenereerd:
+
+Verwijder de Google Maps afbeeldingspreview: Om te zorgen dat WhatsApp geen grote kaart/plattegrond meer bovenaan het bericht plakt, mag de ruwe Google Maps link niet los in de tekst staan.
+
+Hyperlink maskeren: Vervang de volledige, lange Google Maps URL door de tekst: Klik hier om de route te bekijken. Zorg dat deze tekst als een daadwerkelijke, klikbare hyperlink functioneert die rechtstreeks doorverwijst naar de oorspronkelijke Google Maps navigatie-URL.
+
+Maak de rest van de tekst compact en overzichtelijk, zonder onnodige witregels.
+
+3. Website, FAQ en Privacybeleid opschonen:
+Scan de /public map en pas de bestanden index.html, landing.html, support.html, faq.html en privacy.html aan:
+
+Vervang alle vermeldingen van 'Google Maps API' of 'Google Places' door termen als 'Geavanceerde Native Kaarttechnologie' of 'Privacy-vriendelijke Locatiediensten'.
+
+Pas de Privacy Policy aan: Vermeld dat adreszoekopdrachten anoniem en direct via open-source/native technologie op het apparaat worden afgehandeld, zonder dat er privacygevoelige locatiegegevens naar externe cloudservers van derden worden gestuurd.
+
+Pas de FAQ en Landingspagina aan om deze overstap naar lokale verwerking als privacy-vriendelijk uniek verkoopargument te benadrukken.
+
+4. Bouwen en Deployen:
+
+Voer een schone web-export uit: npx expo export --platform web.
+
+Voer een firebase deploy --only hosting uit zodat de vernieuwde landingspagina en privacy-overeenkomst direct live staan op taximeterpro.nl.
+
+Genereer een nieuwe productiebuild voor Android en iOS (verhoog de versienummers automatisch) via EAS zodat we de nieuwe deel-functionaliteit direct in TestFlight kunnen controleren."

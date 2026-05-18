@@ -8,7 +8,7 @@ import { useColors } from "@/hooks/useColors";
 
 
 const FUNCTIES: { icoon: string; titel: string; tekst: string }[] = [
-  { icoon: "navigate-outline", titel: "Straatniveau autocomplete", tekst: "Typ een adres met huisnummer en ontvang directe suggesties via Google Maps." },
+  { icoon: "navigate-outline", titel: "Privacy-vriendelijke locatiezoekopdracht", tekst: "Typ een adres en ontvang directe suggesties via OpenStreetMap — anoniem, zonder cloudkoppeling." },
   { icoon: "card-outline", titel: "Wettelijke tarieven 2026", tekst: "Berekend op basis van de officieel vastgestelde maximumtarieven van de overheid." },
   { icoon: "people-outline", titel: "Auto & Taxibusje", tekst: "Ondersteunt personenauto (max. 4 pers.) en taxibusje (5-8 pers.)." },
   { icoon: "earth-outline", titel: "Internationale ritten", tekst: "Voeg tolkosten, grenstoeslagen en andere extra's toe aan uw berekening." },
@@ -112,14 +112,14 @@ export default function LandingScreen() {
           ))}
         </View>
 
-        {/* Screenshots teaser */}
+        {/* Privacy USP */}
         <View style={[styles.teaserCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.teaserContent}>
             <Ionicons name="shield-checkmark-outline" size={22} color={colors.primary} />
             <View style={{ flex: 1 }}>
-              <Text style={[styles.teaserTitel, { color: colors.foreground }]}>Gebouwd voor taxichauffeurs</Text>
+              <Text style={[styles.teaserTitel, { color: colors.foreground }]}>100% privacy — geen datalek</Text>
               <Text style={[styles.teaserTekst, { color: colors.mutedForeground }]}>
-                Professioneel hulpmiddel om ritprijzen direct inzichtelijk te maken op basis van de wettelijke Nederlandse maximumtarieven.
+                Adreszoekopdrachten worden anoniem verwerkt via open-source locatietechnologie (OpenStreetMap/Photon). Er worden geen privacygevoelige locatiegegevens naar externe cloudservers van derden verstuurd.
               </Text>
             </View>
           </View>

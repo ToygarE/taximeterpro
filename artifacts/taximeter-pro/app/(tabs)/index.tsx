@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as FileSystem from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import {
@@ -44,7 +43,6 @@ export default function CalculatorScreen() {
   const [laden, setLaden] = useState(false);
   const [resultaat, setResultaat] = useState<RitResultaat | null>(null);
   const [internationaal, setInternationaal] = useState(false);
-  const [kaartUrl, setKaartUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOnline && modus === "api") setModus("handmatig");
@@ -72,7 +70,6 @@ export default function CalculatorScreen() {
         const routeData = await haalRouteData(startLocatie, bestemming);
         const rit = berekenRit({ voertuig, afstandKm: routeData.afstandKm, tijdMin: routeData.tijdMin, tarieven, extraKosten, startLocatie, bestemming });
         setResultaat(rit);
-        setKaartUrl(null);
         setHandmatigKm(routeData.afstandKm.toFixed(1));
         setHandmatigMin(String(Math.round(routeData.tijdMin)));
         addRit(rit);
@@ -95,7 +92,6 @@ export default function CalculatorScreen() {
       }
       const rit = berekenRit({ voertuig, afstandKm: km, tijdMin: min, tarieven, extraKosten, startLocatie: startLocatie || "Onbekend", bestemming: bestemming || "Onbekend" });
       setResultaat(rit);
-      setKaartUrl(null);
       addRit(rit);
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
@@ -126,25 +122,26 @@ export default function CalculatorScreen() {
             .map((ek) => ek.beschrijving + ": € " + ek.bedrag.toFixed(2).replace(".", ","))
             .join("\n")
         : "") +
-      "\n\n📍 Bekijk route:\n" + googleMapsUrl + "\n\n" +
-      "Berekend via https://taximeterpro.nl";
+      "\n\nBerekend via https://taximeterpro.nl";
 
-    if (kaartUrl && Platform.OS === "ios" && FileSystem.cacheDirectory) {
-      try {
-        const fileUri = FileSystem.cacheDirectory + "taximeter-route.png";
-        await FileSystem.downloadAsync(kaartUrl, fileUri);
-        await Share.share({ message: tekst, url: fileUri });
-        return;
-      } catch {}
-    }
-
-    try { await Share.share({ message: tekst, title: "Taximeter Pro - Ritprijs" }); } catch {}
+    try {
+      if (Platform.OS === "ios") {
+        await Share.share({
+          message: tekst + "\n\n📍 Klik hier om de route te bekijken ↗",
+          url: googleMapsUrl,
+        });
+      } else {
+        await Share.share({
+          message: tekst + "\n\n📍 Klik hier om de route te bekijken:\n" + googleMapsUrl,
+          title: "Taximeter Pro - Ritprijs",
+        });
+      }
+    } catch {}
   };
 
   const reset = () => {
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setResultaat(null);
-    setKaartUrl(null);
     setStartLocatie("");
     setBestemming("");
     setHandmatigKm("0");
@@ -295,7 +292,6 @@ export default function CalculatorScreen() {
               startLocatie={resultaat.startLocatie}
               bestemming={resultaat.bestemming}
               hoogte={250}
-              onMapUrl={(url) => setKaartUrl(url)}
             />
 
             <View style={[styles.routeInfo, { backgroundColor: colors.card, borderColor: colors.border }]}>

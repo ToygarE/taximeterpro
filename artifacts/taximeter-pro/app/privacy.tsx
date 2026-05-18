@@ -67,7 +67,7 @@ export default function PrivacyScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={[styles.datum, { color: colors.mutedForeground }]}>
-          Laatste update: januari 2026
+          Laatste update: mei 2026
         </Text>
 
         <Text style={[styles.intro, { color: colors.foreground }]}>
@@ -85,8 +85,8 @@ export default function PrivacyScreen() {
         />
 
         <Sectie
-          titel="3. Google Maps API"
-          tekst="Wanneer u een Google Maps API-sleutel heeft geconfigureerd, worden adresinvoer en routeberekeningen verzonden naar de Google Maps API (door Google LLC beheerd). Raadpleeg het privacybeleid van Google (https://policies.google.com/privacy) voor informatie over hoe Google met deze gegevens omgaat. Zonder API-sleutel werkt de app volledig offline zonder externe dataoverdracht."
+          titel="3. Privacy-vriendelijke Locatiediensten"
+          tekst="Adreszoekopdrachten worden anoniem en direct verwerkt via open-source locatietechnologie (OpenStreetMap/Photon), rechtstreeks op uw apparaat. Er worden geen privacygevoelige locatiegegevens naar externe cloudservers van derden verstuurd. De routeberekening maakt gebruik van de Google Maps Directions API, die alleen de door u ingevoerde adressen ontvangt — geen persoonsgegevens of GPS-coördinaten. Raadpleeg het privacybeleid van Google (https://policies.google.com/privacy) voor meer informatie."
         />
 
         <Sectie
@@ -127,7 +127,7 @@ export default function PrivacyScreen() {
         >
           <Ionicons name="shield-checkmark-outline" size={20} color={colors.primary} />
           <Text style={[styles.disclaimerTekst, { color: colors.mutedForeground }]}>
-            Taximeter Pro is gebouwd met respect voor uw privacy. De app verwerkt geen persoonsgegevens en is niet aangesloten op enige analysedienst.
+            Taximeter Pro is gebouwd met respect voor uw privacy. Adreszoekopdrachten verlaten nooit uw apparaat als persoonsgegevens — de app maakt gebruik van anonieme, open-source locatietechnologie.
           </Text>
         </View>
       </ScrollView>

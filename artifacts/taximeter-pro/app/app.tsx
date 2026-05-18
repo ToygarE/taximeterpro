@@ -150,14 +150,32 @@ export default function AppScreen() {
   const deelResultaat = async () => {
     if (!resultaat) return;
     const prijs = "€ " + resultaat.totaalPrijs.toFixed(2).replace(".", ",");
+    const googleMapsUrl =
+      `https://www.google.com/maps/dir/?api=1` +
+      `&origin=${encodeURIComponent(resultaat.startLocatie)}` +
+      `&destination=${encodeURIComponent(resultaat.bestemming)}` +
+      `&travelmode=driving`;
     const tekst =
-      "Taximeter Pro - Ritprijsberekening\n\n" +
-      "Van: " + resultaat.startLocatie + "\nNaar: " + resultaat.bestemming + "\n\n" +
-      "Afstand: " + resultaat.afstandKm.toFixed(1) + " km | Reistijd: " + Math.round(resultaat.tijdMin) + " min\n" +
+      "🚕 Taximeter Pro — Ritprijsberekening\n\n" +
+      "Van: " + resultaat.startLocatie + "\n" +
+      "Naar: " + resultaat.bestemming + "\n\n" +
+      "Afstand: " + resultaat.afstandKm.toFixed(1) + " km  •  Reistijd: " + Math.round(resultaat.tijdMin) + " min\n" +
       "Voertuig: " + (resultaat.voertuig === "auto" ? "Personenauto" : "Taxibusje") + "\n\n" +
-      "Uw geschatte ritprijs via Taximeter Pro bedraagt: " + prijs + "\n\n" +
-      "(Gebaseerd op wettelijke maximumtarieven 2026.)";
-    try { await Share.share({ message: tekst }); } catch {}
+      "Geschatte ritprijs: " + prijs + "\n" +
+      "(Gebaseerd op wettelijke maximumtarieven 2026.)" +
+      "\n\nBerekend via https://taximeterpro.nl";
+    try {
+      if (Platform.OS === "ios") {
+        await Share.share({
+          message: tekst + "\n\n📍 Klik hier om de route te bekijken ↗",
+          url: googleMapsUrl,
+        });
+      } else {
+        await Share.share({
+          message: tekst + "\n\n📍 Klik hier om de route te bekijken:\n" + googleMapsUrl,
+        });
+      }
+    } catch {}
   };
 
   const reset = () => {

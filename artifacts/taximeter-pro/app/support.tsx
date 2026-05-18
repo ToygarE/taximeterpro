@@ -10,7 +10,7 @@ import { useColors } from "@/hooks/useColors";
 const FAQ = [
   {
     vraag: "Hoe nauwkeurig is de berekende prijs?",
-    antwoord: "De berekening is gebaseerd op de wettelijke maximumtarieven 2026 en de route-informatie van Google Maps. De werkelijke ritprijs kan licht afwijken door bijvoorbeeld verkeer, omrijden of wachttijd. De taxameter in het voertuig is altijd leidend.",
+    antwoord: "De berekening is gebaseerd op de wettelijke maximumtarieven 2026 en de route-informatie van geavanceerde kaarttechnologie. De werkelijke ritprijs kan licht afwijken door bijvoorbeeld verkeer, omrijden of wachttijd. De taxameter in het voertuig is altijd leidend.",
   },
   {
     vraag: "Zijn dit de officiële wettelijke tarieven?",
@@ -34,11 +34,15 @@ const FAQ = [
   },
   {
     vraag: "Hoe deel ik een ritprijs met mijn klant?",
-    antwoord: "Na het berekenen van de prijs verschijnt een gele 'Deel'-knop. Tik hierop om de prijsberekening te delen via WhatsApp, SMS of andere apps op uw telefoon. De boodschap bevat route, afstand en het totaalbedrag.",
+    antwoord: "Na het berekenen van de prijs verschijnt een 'Deel'-knop. Tik hierop om de prijsberekening compact te delen via WhatsApp, SMS of andere apps op uw telefoon. Het bericht bevat route, afstand, totaalbedrag en een klikbare routelink.",
   },
   {
     vraag: "Hoe voeg ik de app toe aan mijn startscherm?",
     antwoord: "Op Android: open de app in Chrome en tik op de drie puntjes rechtsboven en kies 'Toevoegen aan startscherm'. Op iOS: open de app in Safari en tik op het deel-icoon en kies 'Zet op beginscherm'. De app werkt dan als een native app zonder browser-interface.",
+  },
+  {
+    vraag: "Worden mijn zoekopdrachten doorgestuurd naar externe servers?",
+    antwoord: "Nee. Adreszoekopdrachten worden verwerkt via OpenStreetMap (Photon), een open-source locatiedienst. Er worden geen persoonsgegevens of GPS-coördinaten naar externe cloudservers van derden verstuurd. De app is privacy-by-design gebouwd.",
   },
   {
     vraag: "Kan ik de tarieven aanpassen als de overheid ze wijzigt?",
