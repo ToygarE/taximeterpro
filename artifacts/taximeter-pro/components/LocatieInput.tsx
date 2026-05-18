@@ -432,7 +432,7 @@ export function LocatieInput({
 }
 
 const styles = StyleSheet.create({
-  wrapper: { position: "relative", zIndex: 1 },
+  wrapper: { position: "relative", zIndex: 1, overflow: "visible" },
   container: {
     flexDirection: "row", alignItems: "center", borderRadius: 14,
     borderWidth: 2, paddingHorizontal: 14, paddingVertical: 12, gap: 10,

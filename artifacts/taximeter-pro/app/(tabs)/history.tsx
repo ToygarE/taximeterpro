@@ -73,12 +73,12 @@ export default function GeschiedenisScreen() {
     try {
       if (Platform.OS === "ios") {
         await Share.share({
-          message: tekst + "\n\n📍 Klik hier om de route te bekijken ↗",
+          message: tekst,
           url: googleMapsUrl,
         });
       } else {
         await Share.share({
-          message: tekst + "\n\n📍 Klik hier om de route te bekijken:\n" + googleMapsUrl,
+          message: tekst + "\n\n📍 " + googleMapsUrl,
           title: "Taximeter Pro - Ritprijs",
         });
       }

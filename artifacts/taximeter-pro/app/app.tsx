@@ -167,12 +167,12 @@ export default function AppScreen() {
     try {
       if (Platform.OS === "ios") {
         await Share.share({
-          message: tekst + "\n\n📍 Klik hier om de route te bekijken ↗",
+          message: tekst,
           url: googleMapsUrl,
         });
       } else {
         await Share.share({
-          message: tekst + "\n\n📍 Klik hier om de route te bekijken:\n" + googleMapsUrl,
+          message: tekst + "\n\n📍 " + googleMapsUrl,
         });
       }
     } catch {}
@@ -220,23 +220,23 @@ export default function AppScreen() {
         </View>
 
         {modus === "api" ? (
-          <View style={{ gap: 10 }}>
-            <View style={{ zIndex: 20 }}>
+          <View style={{ gap: 10, overflow: "visible" }}>
+            <View style={{ zIndex: 20, overflow: "visible" }}>
               <LocatieInput label="Startlocatie" waarde={startLocatie} onVerander={setStartLocatie} icoon="location-outline" toonLocatieKnop />
             </View>
             <View style={[styles.pijlWrap, { backgroundColor: colors.border }]}>
               <Ionicons name="arrow-down-outline" size={16} color={colors.mutedForeground} />
             </View>
-            <View style={{ zIndex: 10 }}>
+            <View style={{ zIndex: 10, overflow: "visible" }}>
               <LocatieInput label="Bestemming" waarde={bestemming} onVerander={setBestemming} icoon="flag-outline" />
             </View>
           </View>
         ) : (
-          <View style={{ gap: 10 }}>
-            <View style={{ zIndex: 20 }}>
+          <View style={{ gap: 10, overflow: "visible" }}>
+            <View style={{ zIndex: 20, overflow: "visible" }}>
               <LocatieInput label="Van (optioneel)" waarde={startLocatie} onVerander={setStartLocatie} icoon="location-outline" toonLocatieKnop />
             </View>
-            <View style={{ zIndex: 10 }}>
+            <View style={{ zIndex: 10, overflow: "visible" }}>
               <LocatieInput label="Naar (optioneel)" waarde={bestemming} onVerander={setBestemming} icoon="flag-outline" />
             </View>
             <HandmatigInput kmWaarde={handmatigKm} onKmVerander={setHandmatigKm} minWaarde={handmatigMin} onMinVerander={setHandmatigMin} />
